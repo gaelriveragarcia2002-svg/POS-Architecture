@@ -1,0 +1,90 @@
+{
+  "name": "POS-Architecture",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "prefix": "app",
+  "sourceRoot": "apps/POS-Architecture/src",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@angular/build:application",
+      "outputs": [
+        "{options.outputPath}"
+      ],
+      "defaultConfiguration": "production",
+      "options": {
+        "outputPath": "dist/apps/POS-Architecture",
+        "browser": "apps/POS-Architecture/src/main.ts",
+        "tsConfig": "apps/POS-Architecture/tsconfig.app.json",
+        "assets": [
+          {
+            "glob": "**/*",
+            "input": "apps/POS-Architecture/public"
+          }
+        ],
+        "styles": [
+          "apps/POS-Architecture/src/styles.css"
+        ],
+        "server": "apps/POS-Architecture/src/main.server.ts",
+        "ssr": {
+          "entry": "apps/POS-Architecture/src/server.ts"
+        },
+        "outputMode": "server"
+      },
+      "configurations": {
+        "production": {
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "500kb",
+              "maximumError": "1mb"
+            },
+            {
+              "type": "anyComponentStyle",
+              "maximumWarning": "4kb",
+              "maximumError": "8kb"
+            }
+          ],
+          "outputHashing": "all"
+        },
+        "development": {
+          "optimization": false,
+          "extractLicenses": false,
+          "sourceMap": true
+        }
+      }
+    },
+    "serve": {
+      "continuous": true,
+      "executor": "@angular/build:dev-server",
+      "defaultConfiguration": "development",
+      "configurations": {
+        "production": {
+          "buildTarget": "POS-Architecture:build:production"
+        },
+        "development": {
+          "buildTarget": "POS-Architecture:build:development"
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    },
+    "test": {
+      "executor": "@angular/build:unit-test",
+      "options": {
+        "watch": false
+      }
+    },
+    "serve-static": {
+      "continuous": true,
+      "executor": "@nx/web:file-server",
+      "options": {
+        "buildTarget": "POS-Architecture:build",
+        "port": 4200,
+        "staticFilePath": "dist/apps/POS-Architecture/browser",
+        "spa": true
+      }
+    }
+  }
+}
