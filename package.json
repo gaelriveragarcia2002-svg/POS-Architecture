@@ -14,8 +14,11 @@
     "@angular/platform-server": "~22.0.4",
     "@angular/router": "~22.0.4",
     "@angular/ssr": "~22.0.4",
+    "@tailwindcss/postcss": "^4.3.3",
     "express": "^4.21.2",
-    "rxjs": "~7.8.0"
+    "postcss": "^8.5.24",
+    "rxjs": "~7.8.0",
+    "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
     "@angular-devkit/core": "~22.0.0",

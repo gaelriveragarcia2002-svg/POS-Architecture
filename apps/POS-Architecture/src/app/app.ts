@@ -1,12 +1,13 @@
 import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { NxWelcome } from './nx-welcome';
-
 @Component({
   imports: [NxWelcome, RouterModule],
   selector: 'app-root',
-  templateUrl: './app.html',
-  styleUrl: './app.css',
+  template: `
+    <app-nx-welcome></app-nx-welcome>
+    <router-outlet></router-outlet>
+  `,
 })
 export class App {
   protected title = 'POS-Architecture';
