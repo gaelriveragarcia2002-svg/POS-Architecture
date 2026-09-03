@@ -4,7 +4,9 @@
   "projectType": "application",
   "prefix": "app",
   "sourceRoot": "apps/POS-Architecture/src",
-  "tags": [],
+  "tags": [
+    "type:app"
+  ],
   "targets": {
     "build": {
       "executor": "@angular/build:application",
@@ -50,6 +52,22 @@
         "development": {
           "optimization": false,
           "extractLicenses": false,
+          "sourceMap": true,
+          "fileReplacements": [
+            {
+              "replace": "apps/POS-Architecture/src/environments/environment.ts",
+              "with": "apps/POS-Architecture/src/environments/environment.development.ts"
+            }
+          ]
+        },
+        "qa": {
+          "fileReplacements": [
+            {
+              "replace": "apps/POS-Architecture/src/environments/environment.ts",
+              "with": "apps/POS-Architecture/src/environments/environment.qa.ts"
+            }
+          ],
+          "optimization": true,
           "sourceMap": true
         }
       }
@@ -64,6 +82,9 @@
         },
         "development": {
           "buildTarget": "POS-Architecture:build:development"
+        },
+        "qa": {
+          "buildTarget": "POS-Architecture:build:qa"
         }
       }
     },

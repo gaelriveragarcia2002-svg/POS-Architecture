@@ -1,0 +1,9 @@
+{
+  "name": "session-contract",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/shared/session-contract/src",
+  "projectType": "library",
+  "tags": ["type:domain", "scope:shared"],
+  "// targets": "to see all targets run: nx show project session-contract --web",
+  "targets": {}
+}

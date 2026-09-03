@@ -14,7 +14,16 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "strict": false,
-    "paths": {}
+    "paths": {
+      "@pos-architecture/session-contract": [
+        "./libs/shared/session-contract/src/index.ts"
+      ],
+      "@pos-architecture/util-authorization": [
+        "./libs/shared/util-authorization/src/index.ts"
+      ],
+      "@pos-architecture/auth": ["./libs/features/auth/src/index.ts"],
+      "@pos-architecture/core": ["./libs/shared/core/src/index.ts"]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }
