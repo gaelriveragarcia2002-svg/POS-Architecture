@@ -1,13 +1,30 @@
 import { Route } from '@angular/router';
-import { InspectionPageComponent } from './features/inspections/presentation/inspection.page.component';
-import { HomePageComponent } from './features/items/presentation/home.page.component';
-import { SqliteConsolePageComponent } from './shared/presentation/sqlite-console.page.component';
 
 export const appRoutes: Route[] = [
-    { path: '', loadComponent: () => InspectionPageComponent },
+    {
+        path: '',
+        loadComponent: () =>
+            import('./features/inspections/presentation/inspection.page.component').then(
+                (m) => m.InspectionPageComponent,
+            ),
+    },
     // Demo de items: queda parqueada pero accesible, no se borró.
-    { path: 'items', loadComponent: () => HomePageComponent },
-    // Debug only — ver el comentario en el componente antes de exponer esto
+    {
+        path: 'items',
+        loadComponent: () =>
+            import('./features/items/presentation/home.page.component').then(
+                (m) => m.HomePageComponent,
+            ),
+    },
+    // Debug only — pesa lo que pesa AG Grid, por eso va lazy de verdad, en su
+    // propio chunk, nunca dentro del bundle principal que descarga cualquier
+    // usuario real. Ver el comentario en el componente antes de exponer esto
     // a un usuario real.
-    { path: 'db', loadComponent: () => SqliteConsolePageComponent },
+    {
+        path: 'db',
+        loadComponent: () =>
+            import('./shared/presentation/sqlite-console.page.component').then(
+                (m) => m.SqliteConsolePageComponent,
+            ),
+    },
 ];

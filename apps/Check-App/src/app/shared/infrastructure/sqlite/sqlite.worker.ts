@@ -33,20 +33,28 @@ const ready = initDb();
 
 // * Listener de evento
 addEventListener('message', async (event: MessageEvent<QueryRequest>) => {
-  const { id, sql, params, method } = event.data;
+  const { id, sql, params, method, rowMode } = event.data;
 
   try {
     // Dentro del try: si initDb() rechaza hay que contestar igual, porque si no
     // el cliente se queda esperando una respuesta que nunca llega.
     await ready;
 
-    // selectArrays y no selectObjects: drizzle mapea las columnas por posicion,
-    // con objetos leeria row[0], row[1]... y devolveria undefined en cada campo.
-    // Tambien sirve para DDL (CREATE TABLE): internamente usa exec() y
-    // simplemente no produce filas.
-    const rows = db.selectArrays(sql, params);
+    // selectArrays y no selectObjects para drizzle: mapea las columnas por
+    // posicion, con objetos leeria row[0], row[1]... y devolveria undefined
+    // en cada campo. Tambien sirve para DDL (CREATE TABLE): internamente usa
+    // exec() y simplemente no produce filas. rowMode 'object' (solo lo pide
+    // la consola de debug) usa selectObjects para tener nombres de columna.
+    let payload: QueryRows;
+    if (rowMode === 'object') {
+      // Nadie pide 'get' en modo objeto (solo lo usa la consola, con 'all').
+      if (method === 'get') throw new Error("method 'get' no soporta rowMode 'object'.");
+      payload = db.selectObjects(sql, params);
+    } else {
+      const rows = db.selectArrays(sql, params);
+      payload = method === 'get' ? (rows[0] ?? []) : rows;
+    }
 
-    const payload: QueryRows = method === 'get' ? (rows[0] ?? []) : rows;
     postMessage({ id, rows: payload } satisfies QuerySuccessResponse);
   } catch (e: unknown) {
     const error = e instanceof Error ? e.message : String(e);

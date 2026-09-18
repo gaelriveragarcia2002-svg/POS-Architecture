@@ -8,13 +8,21 @@ export interface QueryRequest {
   sql: string;
   params: SqlValue[];
   method: QueryMethod;
+  /**
+   * 'array' (default): filas posicionales — lo que necesita drizzle.
+   * 'object': filas como { columna: valor }, con nombres de columna reales
+   * — solo lo usa la consola de debug (ver sqlite-console.page.component),
+   * nunca un adapter de drizzle. Ignorado si `method` es 'get'.
+   */
+  rowMode?: 'array' | 'object';
 }
 
 /**
- * drizzle espera las filas como arrays posicionales.
- * Para `get` manda una sola fila plana; para el resto, la lista completa.
+ * drizzle espera las filas como arrays posicionales (rowMode 'array', el
+ * default). Para `get` manda una sola fila plana; para el resto, la lista
+ * completa. rowMode 'object' devuelve filas con nombre de columna.
  */
-export type QueryRows = SqlValue[] | SqlValue[][];
+export type QueryRows = SqlValue[] | SqlValue[][] | Record<string, SqlValue>[];
 
 export interface QuerySuccessResponse {
   id: number;

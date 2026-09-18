@@ -11,6 +11,7 @@ export interface SqliteClient {
     sql: string,
     params: QueryRequest['params'],
     method: QueryMethod,
+    rowMode?: QueryRequest['rowMode'],
   ): Promise<QueryRows>;
 }
 
@@ -51,11 +52,11 @@ export function createSqliteClient(worker: Worker): SqliteClient {
     failAll(new Error('sqlite worker: no se pudo deserializar el mensaje'));
 
   return {
-    execute(sql, params, method) {
+    execute(sql, params, method, rowMode) {
       const id = counter++;
       return new Promise<QueryRows>((resolve, reject) => {
         pending.set(id, { resolve, reject });
-        worker.postMessage({ id, sql, params, method } satisfies QueryRequest);
+        worker.postMessage({ id, sql, params, method, rowMode } satisfies QueryRequest);
       });
     },
   };

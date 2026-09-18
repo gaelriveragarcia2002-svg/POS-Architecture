@@ -43,11 +43,15 @@ import {
                         <label [attr.for]="field.id">
                             {{ field.label }} @if (field.required) { * }
                         </label>
+                        <!-- Los inputs se bindean desde answers() y no solo
+                             hacia ella: al limpiar el formulario tras guardar,
+                             el DOM tiene que reflejar el reset. -->
                         @switch (field.type) {
                             @case ('boolean') {
                                 <input
                                     [id]="field.id"
                                     type="checkbox"
+                                    [checked]="answers()[field.id] === true"
                                     (change)="setAnswer(field.id, $any($event.target).checked)"
                                 />
                             }
@@ -55,6 +59,7 @@ import {
                                 <input
                                     [id]="field.id"
                                     type="number"
+                                    [value]="answers()[field.id] ?? ''"
                                     (input)="setAnswer(field.id, $any($event.target).valueAsNumber)"
                                 />
                             }
@@ -62,6 +67,7 @@ import {
                                 <input
                                     [id]="field.id"
                                     type="text"
+                                    [value]="answers()[field.id] ?? ''"
                                     (input)="setAnswer(field.id, $any($event.target).value)"
                                 />
                             }
