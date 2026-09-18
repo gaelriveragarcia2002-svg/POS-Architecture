@@ -1,0 +1,113 @@
+{
+  "name": "Check-App",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "prefix": "app",
+  "sourceRoot": "apps/Check-App/src",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@angular/build:application",
+      "outputs": [
+        "{options.outputPath}"
+      ],
+      "defaultConfiguration": "production",
+      "options": {
+        "outputPath": "dist/apps/Check-App",
+        "browser": "apps/Check-App/src/main.ts",
+        "tsConfig": "apps/Check-App/tsconfig.app.json",
+        "assets": [
+          {
+            "glob": "**/*",
+            "input": "apps/Check-App/public"
+          },
+          {
+            "glob": "sqlite3.wasm",
+            "input": "node_modules/@sqlite.org/sqlite-wasm/dist",
+            "output": "."
+          },
+          {
+            "glob": "sqlite3-opfs-async-proxy.js",
+            "input": "node_modules/@sqlite.org/sqlite-wasm/dist",
+            "output": "."
+          }
+        ],
+        "styles": [
+          "apps/Check-App/src/styles.css"
+        ],
+        "server": "apps/Check-App/src/main.server.ts",
+        "ssr": {
+          "entry": "apps/Check-App/src/server.ts"
+        },
+        "outputMode": "server",
+        "webWorkerTsConfig": "apps/Check-App/tsconfig.worker.json"
+      },
+      "configurations": {
+        "production": {
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "500kb",
+              "maximumError": "1mb"
+            },
+            {
+              "type": "anyComponentStyle",
+              "maximumWarning": "4kb",
+              "maximumError": "8kb"
+            }
+          ],
+          "outputHashing": "all"
+        },
+        "development": {
+          "optimization": false,
+          "extractLicenses": false,
+          "sourceMap": true
+        }
+      }
+    },
+    "serve": {
+      "continuous": true,
+      "executor": "@angular/build:dev-server",
+      "defaultConfiguration": "development",
+      "configurations": {
+        "production": {
+          "buildTarget": "Check-App:build:production"
+        },
+        "development": {
+          "buildTarget": "Check-App:build:development"
+        }
+      },
+      "options": {
+        "headers": {
+          "Cross-Origin-Opener-Policy": "same-origin",
+          "Cross-Origin-Embedder-Policy": "require-corp"
+        },
+        "prebundle": {
+          "exclude": [
+            "@sqlite.org/sqlite-wasm"
+          ]
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    },
+    "test": {
+      "executor": "@angular/build:unit-test",
+      "options": {
+        "watch": false,
+        "webWorkerTsConfig": "apps/Check-App/tsconfig.worker.json"
+      }
+    },
+    "serve-static": {
+      "continuous": true,
+      "executor": "@nx/web:file-server",
+      "options": {
+        "buildTarget": "Check-App:build",
+        "port": 4200,
+        "staticFilePath": "dist/apps/Check-App/browser",
+        "spa": true
+      }
+    }
+  }
+}
