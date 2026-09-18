@@ -9,7 +9,9 @@ import type {
 
 let db: OpfsDatabase;
 
-// * Funcion de inicializacion de DB.
+// * Funcion de inicializacion de DB. Generico: no conoce tablas de ninguna
+// feature — cada adaptador de infraestructura migra su propio esquema
+// mandando su propio CREATE TABLE por el mismo canal de queries.
 async function initDb(): Promise<void> {
   const sqlite3 = await sqlite3InitModule();
 
@@ -24,15 +26,6 @@ async function initDb(): Promise<void> {
 
   // OpfsDb requiere que el worker tenga acceso síncrono al OPFS
   db = new sqlite3.oo1.OpfsDb('/app.sqlite3');
-
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS items (
-      id TEXT PRIMARY KEY,
-      name TEXT NOT NULL,
-      quantity INTEGER DEFAULT 0,
-      created_at TEXT NOT NULL
-    )
-  `);
 }
 
 // Se lanza una sola vez; cada query espera a que termine.
@@ -49,6 +42,8 @@ addEventListener('message', async (event: MessageEvent<QueryRequest>) => {
 
     // selectArrays y no selectObjects: drizzle mapea las columnas por posicion,
     // con objetos leeria row[0], row[1]... y devolveria undefined en cada campo.
+    // Tambien sirve para DDL (CREATE TABLE): internamente usa exec() y
+    // simplemente no produce filas.
     const rows = db.selectArrays(sql, params);
 
     const payload: QueryRows = method === 'get' ? (rows[0] ?? []) : rows;

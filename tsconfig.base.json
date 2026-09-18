@@ -22,7 +22,11 @@
         "./libs/shared/util-authorization/src/index.ts"
       ],
       "@pos-architecture/auth": ["./libs/features/auth/src/index.ts"],
-      "@pos-architecture/core": ["./libs/shared/core/src/index.ts"]
+      "@pos-architecture/core": ["./libs/shared/core/src/index.ts"],
+      "@pos-architecture/items": ["./libs/features/items/src/index.ts"],
+      "@pos-architecture/inspections": [
+        "./libs/features/inspections/src/index.ts"
+      ]
     }
   },
   "exclude": ["node_modules", "tmp"]

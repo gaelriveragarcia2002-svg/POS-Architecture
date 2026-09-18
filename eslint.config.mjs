@@ -25,6 +25,14 @@ export default [
               onlyDependOnLibsWithTags: ['scope:auth', 'scope:shared'],
             },
             {
+              sourceTag: 'scope:items',
+              onlyDependOnLibsWithTags: ['scope:items', 'scope:shared'],
+            },
+            {
+              sourceTag: 'scope:inspections',
+              onlyDependOnLibsWithTags: ['scope:inspections', 'scope:shared'],
+            },
+            {
               sourceTag: 'scope:shared',
               onlyDependOnLibsWithTags: ['scope:shared'],
             },

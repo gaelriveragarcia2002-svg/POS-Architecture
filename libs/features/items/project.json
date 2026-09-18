@@ -1,0 +1,12 @@
+{
+  "name": "items",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/features/items/src",
+  "projectType": "library",
+  "tags": ["type:feature", "scope:items"],
+  "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    }
+  }
+}
