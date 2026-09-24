@@ -14,3 +14,6 @@ export * from './lib/infrastructure/config/api-config.token';
 export * from './lib/infrastructure/guards/auth-guard';
 export * from './lib/infrastructure/interceptors/auth-intercepetor';
 export * from './lib/infrastructure/providers/core-providers';
+
+// presentation
+export * from './lib/presentation/components/input-wrapper.component';

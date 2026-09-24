@@ -1,31 +1,21 @@
 import { Injectable, inject } from '@angular/core';
-import { drizzle } from 'drizzle-orm/sqlite-proxy';
 import { Observable, from, map } from 'rxjs';
 import {
     Inspection,
     InspectionsRepository,
     NewInspection,
 } from '@pos-architecture/inspections';
-import { SqliteConnection } from '../../../../shared/infrastructure/sqlite/sqlite-connection';
+import { SQLITE_DB } from '../../../../shared/infrastructure/sqlite/sqlite-db';
 import { InspectionMapper } from '../mappers/inspection.mapper';
 import { inspections } from '../persistence/inspections.schema';
 
 /* Implementa el puerto InspectionsRepository sobre drizzle-orm/sqlite-proxy,
- * hablando con el unico Worker de SQLite de la app via SqliteConnection. */
+ * hablando con el unico Worker de SQLite de la app via SQLITE_DB. */
 @Injectable()
 export class DrizzleInspectionsRepository extends InspectionsRepository {
 
     // * Inyeccion de dependencias.
-    private connection = inject(SqliteConnection);
-
-    // * Cliente drizzle: solo guarda el callback, no toca el Worker todavia
-    // (eso pasa recien en la primera query real, ver ensureReady()).
-    private db = drizzle((sql, params, method) =>
-        this.connection
-            .getClient()
-            .execute(sql, params, method)
-            .then((rows) => ({ rows })),
-    );
+    private db = inject(SQLITE_DB);
 
     // Migracion perezosa: se dispara en la PRIMERA query real, nunca en la
     // construccion de la clase, para no crear el Worker durante SSR.

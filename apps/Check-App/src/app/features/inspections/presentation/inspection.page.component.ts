@@ -12,7 +12,10 @@ import {
 @Component({
     selector: 'app-inspection-page',
     template: `
-        <div>
+
+
+        
+        <!-- <div>
             <p>Estado: {{ $ready() ? 'listo ✅' : 'inicializando…' }}</p>
 
             @if ($error(); as error) {
@@ -43,9 +46,6 @@ import {
                         <label [attr.for]="field.id">
                             {{ field.label }} @if (field.required) { * }
                         </label>
-                        <!-- Los inputs se bindean desde answers() y no solo
-                             hacia ella: al limpiar el formulario tras guardar,
-                             el DOM tiene que reflejar el reset. -->
                         @switch (field.type) {
                             @case ('boolean') {
                                 <input
@@ -93,7 +93,7 @@ import {
                     <li>{{ inspection.subject }} — {{ inspection.completedAt }}</li>
                 }
             </ul>
-        </div>
+        </div> -->
     `,
 })
 export class InspectionPageComponent {

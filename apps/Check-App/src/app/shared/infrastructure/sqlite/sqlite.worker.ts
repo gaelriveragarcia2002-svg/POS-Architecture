@@ -24,8 +24,11 @@ async function initDb(): Promise<void> {
     );
   }
 
-  // OpfsDb requiere que el worker tenga acceso síncrono al OPFS
+  //* OpfsDb requiere que el worker tenga acceso síncrono al OPFS
   db = new sqlite3.oo1.OpfsDb('/app.sqlite3');
+
+  //* Activar las llaves foraneas por defecto.
+  db.exec('PRAGMA foreign_keys = ON;');
 }
 
 // Se lanza una sola vez; cada query espera a que termine.

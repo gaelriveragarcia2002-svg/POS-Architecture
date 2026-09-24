@@ -22,9 +22,9 @@ interface PendingQuery {
 
 /**
  * RPC de bajo nivel hacia el worker de SQLite: manda SQL crudo y no sabe
- * nada de drizzle ni de ninguna tabla en particular. Cada feature arma su
- * propio cliente drizzle encima de este cliente (ver
- * items/infrastructure/adapters/drizzle-items.repository.ts).
+ * nada de drizzle ni de ninguna tabla en particular. El cliente drizzle
+ * compartido se arma encima de este cliente en SQLITE_DB (ver
+ * shared/infrastructure/sqlite/sqlite-db.ts).
  */
 export function createSqliteClient(worker: Worker): SqliteClient {
   let counter = 0;

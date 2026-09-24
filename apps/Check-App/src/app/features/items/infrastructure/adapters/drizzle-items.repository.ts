@@ -1,27 +1,17 @@
 import { Injectable, inject } from '@angular/core';
-import { drizzle } from 'drizzle-orm/sqlite-proxy';
 import { Observable, from, map } from 'rxjs';
-import { SqliteConnection } from '../../../../shared/infrastructure/sqlite/sqlite-connection';
+import { SQLITE_DB } from '../../../../shared/infrastructure/sqlite/sqlite-db';
 import { Item, ItemsRepository, NewItem } from '@pos-architecture/items';
 import { ItemMapper } from '../mappers/item.mapper';
 import { items } from '../persistence/items.schema';
 
 /* Implementa el puerto ItemsRepository sobre drizzle-orm/sqlite-proxy,
- * hablando con el unico Worker de SQLite de la app via SqliteConnection. */
+ * hablando con el unico Worker de SQLite de la app via SQLITE_DB. */
 @Injectable()
 export class DrizzleItemsRepository extends ItemsRepository {
 
     // * Inyeccion de dependencias.
-    private connection = inject(SqliteConnection);
-
-    // * Cliente drizzle: solo guarda el callback, no toca el Worker todavia
-    // (eso pasa recien en la primera query real, ver ensureReady()).
-    private db = drizzle((sql, params, method) =>
-        this.connection
-            .getClient()
-            .execute(sql, params, method)
-            .then((rows) => ({ rows })),
-    );
+    private db = inject(SQLITE_DB);
 
     // Migracion perezosa: el worker es generico y no crea tablas por su
     // cuenta, asi que este adaptador es dueño de migrar su propio esquema.

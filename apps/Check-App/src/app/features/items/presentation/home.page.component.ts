@@ -1,5 +1,5 @@
-import { Component, afterNextRender, inject } from '@angular/core';
-import { AddItemUseCase, ItemsStore, ListItemsUseCase } from '@pos-architecture/items';
+import { Component, afterNextRender, inject, signal } from '@angular/core';
+import { AddItemUseCase, Item, ListItemsUseCase } from '@pos-architecture/items';
 
 @Component({
 	selector: 'app-home-page',
@@ -27,18 +27,15 @@ export class HomePageComponent {
     private readonly listItems = inject(ListItemsUseCase);
     private readonly addItem = inject(AddItemUseCase);
 
-    // * Estados de lectura (via store de la feature).
-    private readonly store = inject(ItemsStore);
-    public $items = this.store.items;
-    public $ready = this.store.ready;
-    public $error = this.store.error;
+    // * Estado de UI de esta pantalla (no es responsabilidad de application).
+    public $items = signal<Item[]>([]);
+    public $ready = signal(false);
+    public $error = signal<string | null>(null);
 
     // * Constructor del componente.
     public constructor() {
         // El Worker solo existe en el browser: en SSR no hay Worker ni OPFS.
-        afterNextRender(() => {
-            this.listItems.execute().subscribe();
-        });
+        afterNextRender(() => this.reload());
     }
 
     // * Metodos del componente.
@@ -46,6 +43,23 @@ export class HomePageComponent {
         this.addItem.execute({
             name: 'Producto ' + Date.now(),
             quantity: Math.floor(Math.random() * 100),
-        }).subscribe();
+        }).subscribe({
+            next: () => this.reload(),
+            error: (e: unknown) => this.$error.set(e instanceof Error ? e.message : String(e)),
+        });
+    }
+
+    private reload() {
+        this.listItems.execute().subscribe({
+            next: (items) => {
+                this.$items.set(items);
+                this.$ready.set(true);
+                this.$error.set(null);
+            },
+            error: (e: unknown) => {
+                this.$ready.set(false);
+                this.$error.set(e instanceof Error ? e.message : String(e));
+            },
+        });
     }
 }

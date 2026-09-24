@@ -26,6 +26,9 @@
       "@pos-architecture/items": ["./libs/features/items/src/index.ts"],
       "@pos-architecture/inspections": [
         "./libs/features/inspections/src/index.ts"
+      ],
+      "@pos-architecture/util-common": [
+        "./libs/shared/util-common/src/index.ts"
       ]
     }
   },
