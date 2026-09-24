@@ -1,2 +1,124 @@
 /* You can add global styles to this file, and also import other style files */
 @import 'tailwindcss';
+
+
+/* @link https://utopia.fyi/type/calculator?c=360,16,1.2,1240,20,1.25,10,2,&s=0.75|0.5|0.25,1.5|2|3|4|6,s-l&g=s,l,xl,12 */
+:root {
+  /* * Escala tipográfica: 16px → 20px de base entre 360px y 1240px de viewport. */
+  --step--2: clamp(0.6944rem, 0.6513rem + 0.1919vw, 0.8rem);
+  --step--1: clamp(0.8333rem, 0.7652rem + 0.303vw, 1rem);
+  --step-0: clamp(1rem, 0.8977rem + 0.4545vw, 1.25rem);
+  --step-1: clamp(1.2rem, 1.0517rem + 0.6591vw, 1.5625rem);
+  --step-2: clamp(1.44rem, 1.2301rem + 0.933vw, 1.9531rem);
+  --step-3: clamp(1.728rem, 1.4362rem + 1.2971vw, 2.4414rem);
+  --step-4: clamp(2.0736rem, 1.6734rem + 1.7785vw, 3.0518rem);
+  --step-5: clamp(2.4883rem, 1.9457rem + 2.4116vw, 3.8147rem);
+  --step-6: clamp(2.986rem, 2.2568rem + 3.2407vw, 4.7684rem);
+  --step-7: clamp(3.5832rem, 2.6107rem + 4.3223vw, 5.9605rem);
+  --step-8: clamp(4.2998rem, 3.0109rem + 5.7287vw, 7.4506rem);
+  --step-9: clamp(5.1598rem, 3.4606rem + 7.5517vw, 9.3132rem);
+  --step-10: clamp(6.1917rem, 3.9623rem + 9.9087vw, 11.6415rem);
+
+  /* * Escala de espacios: para usar con var() en los .css de los componentes. */
+  --space-3xs: clamp(0.25rem, 0.2244rem + 0.1136vw, 0.3125rem);
+  --space-2xs: clamp(0.5rem, 0.4489rem + 0.2273vw, 0.625rem);
+  --space-xs: clamp(0.75rem, 0.6733rem + 0.3409vw, 0.9375rem);
+  --space-s: clamp(1rem, 0.8977rem + 0.4545vw, 1.25rem);
+  --space-m: clamp(1.5rem, 1.3466rem + 0.6818vw, 1.875rem);
+  --space-l: clamp(2rem, 1.7955rem + 0.9091vw, 2.5rem);
+  --space-xl: clamp(3rem, 2.6932rem + 1.3636vw, 3.75rem);
+  --space-2xl: clamp(4rem, 3.5909rem + 1.8182vw, 5rem);
+  --space-3xl: clamp(6rem, 5.3864rem + 2.7273vw, 7.5rem);
+
+  /* * Pares: crecen más que un paso individual, útiles para paddings de secciones. */
+  --space-3xs-2xs: clamp(0.25rem, 0.0966rem + 0.6818vw, 0.625rem);
+  --space-2xs-xs: clamp(0.5rem, 0.321rem + 0.7955vw, 0.9375rem);
+  --space-xs-s: clamp(0.75rem, 0.5455rem + 0.9091vw, 1.25rem);
+  --space-s-m: clamp(1rem, 0.642rem + 1.5909vw, 1.875rem);
+  --space-m-l: clamp(1.5rem, 1.0909rem + 1.8182vw, 2.5rem);
+  --space-l-xl: clamp(2rem, 1.2841rem + 3.1818vw, 3.75rem);
+  --space-xl-2xl: clamp(3rem, 2.1818rem + 3.6364vw, 5rem);
+  --space-2xl-3xl: clamp(4rem, 2.5682rem + 6.3636vw, 7.5rem);
+  --space-s-l: clamp(1rem, 0.3864rem + 2.7273vw, 2.5rem);
+
+  /* * Grid de la página. */
+  --grid-max-width: 77.5rem;
+  --grid-gutter: var(--space-s-l);
+  --grid-columns: 12;
+}
+
+/* Conecta Tailwind a las escalas: las clases de siempre (p-4, gap-2, text-sm...) quedan fluidas sin cambiar las plantillas. */
+@theme {
+  /* * Unidad base de p-*, m-*, gap-*, w-*, size-*, etc.: 4px → 5px, la misma proporción que el texto. */
+  --spacing: clamp(0.25rem, 0.2244rem + 0.1136vw, 0.3125rem);
+
+  --text-xs: var(--step--2);
+  --text-xs--line-height: 1.5;
+  --text-sm: var(--step--1);
+  --text-sm--line-height: 1.5;
+  --text-base: var(--step-0);
+  --text-base--line-height: 1.5;
+  --text-lg: var(--step-1);
+  --text-lg--line-height: 1.45;
+  --text-xl: var(--step-2);
+  --text-xl--line-height: 1.35;
+  --text-2xl: var(--step-3);
+  --text-2xl--line-height: 1.25;
+  --text-3xl: var(--step-4);
+  --text-3xl--line-height: 1.2;
+  --text-4xl: var(--step-5);
+  --text-4xl--line-height: 1.15;
+  --text-5xl: var(--step-6);
+  --text-5xl--line-height: 1.1;
+  --text-6xl: var(--step-7);
+  --text-6xl--line-height: 1.05;
+  --text-7xl: var(--step-8);
+  --text-7xl--line-height: 1;
+  --text-8xl: var(--step-9);
+  --text-8xl--line-height: 1;
+  --text-9xl: var(--step-10);
+  --text-9xl--line-height: 1;
+}
+
+/* Tamaños por defecto de las etiquetas. En la capa base para que las utilidades de Tailwind (text-sm, etc.) los sobrescriban. */
+@layer base {
+  body {
+    font-size: var(--step-0);
+    line-height: 1.5;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    line-height: 1.2;
+    text-wrap: balance;
+  }
+
+  h1 { font-size: var(--step-5); }
+  h2 { font-size: var(--step-4); }
+  h3 { font-size: var(--step-3); }
+  h4 { font-size: var(--step-2); }
+  h5 { font-size: var(--step-1); }
+  h6 { font-size: var(--step-0); }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  small {
+    font-size: var(--step--1);
+  }
+}
+
+/* * Contenedor centrado con el ancho máximo y el margen lateral fluido del grid. */
+@utility u-container {
+  width: 100%;
+  max-width: var(--grid-max-width);
+  margin-inline: auto;
+  padding-inline: var(--grid-gutter);
+}
+
+/* * Separación vertical automática entre hijos (textos, formularios). Ajustable con --flow-space. */
+@utility flow {
+  & > * + * {
+    margin-block-start: var(--flow-space, 1em);
+  }
+}

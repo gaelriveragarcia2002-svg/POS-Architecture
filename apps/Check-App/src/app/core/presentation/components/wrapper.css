@@ -17,6 +17,19 @@
     grid-template-columns: minmax(80px, 80px) 1fr;
 }
 
+/* * VISTA TABLET (640px–1023px): colapsado por defecto con CSS, así el HTML prerenderizado ya sale a 80px.
+   Solo se abre si el usuario lo pide (.expanded). */
+@media (max-width: 1023.98px) {
+    :host:not(.expanded) {
+        grid-template-columns: minmax(80px, 80px) 1fr;
+    }
+}
+
+.bottom-nav {
+    grid-area: nav;
+    display: none;
+}
+
 
 .sidebar {
     grid-area: sidebar;
@@ -32,6 +45,7 @@
 }
 
 .footer {
+    border-top: 2px white solid;
     grid-area: footer;
     padding: 10px;
 }
@@ -51,6 +65,29 @@
     fill: none;
     stroke: white;
     stroke-width: 2px;
+}
+
+/* * VISTA MOBILE (< 640px, el breakpoint `sm` de Tailwind): una sola columna, contenido arriba y barra inferior abajo.
+   Va al final del archivo para ganarle a :host.collapsed. */
+@media (max-width: 639.98px) {
+    :host,
+    :host.collapsed,
+    :host:not(.expanded) {
+        grid-template-columns: 1fr;
+        grid-template-rows: minmax(0, 1fr) auto;
+        grid-template-areas:
+            "content"
+            "nav";
+    }
+
+    .sidebar,
+    .footer {
+        display: none;
+    }
+
+    .bottom-nav {
+        display: block;
+    }
 }
 
 
