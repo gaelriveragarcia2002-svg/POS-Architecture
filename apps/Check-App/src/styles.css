@@ -1,5 +1,6 @@
 /* You can add global styles to this file, and also import other style files */
 @import 'tailwindcss';
+@import './app/shared/presentation/animations/animations.css';
 
 
 /* @link https://utopia.fyi/type/calculator?c=360,16,1.2,1240,20,1.25,10,2,&s=0.75|0.5|0.25,1.5|2|3|4|6,s-l&g=s,l,xl,12 */

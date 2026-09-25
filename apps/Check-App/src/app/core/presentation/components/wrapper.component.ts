@@ -1,4 +1,4 @@
-import { Component, ElementRef, signal, viewChild } from '@angular/core';
+import { afterNextRender, Component, ElementRef, signal, viewChild } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { BottomNavComponent } from './bottom-nav.component';
 import { edgeWave, verticalEdge } from './edge-wave';
@@ -11,20 +11,22 @@ import { SidebarComponent } from './sidebar.component';
 	selector: 'app-wrapper',
 	imports: [RouterOutlet, SidebarComponent, BottomNavComponent, FooterComponent],
     styleUrl: `./wrapper.css`,
-    // Sin clase = automático por breakpoint (wrapper.css); .collapsed / .expanded = lo que eligió el usuario.
+    // Sin modificador = automático por breakpoint (wrapper.css); .wrapper--collapsed / .wrapper--expanded = lo que eligió el usuario.
     host: {
-        '[class.collapsed]': 'collapsed() === true',
-        '[class.expanded]': 'collapsed() === false',
+        'class': 'wrapper',
+        '[class.wrapper--collapsed]': 'collapsed() === true',
+        '[class.wrapper--expanded]': 'collapsed() === false',
+        '[class.wrapper--ready]': 'ready()',
     },
 	template: `
         <!-- * VISTA MOBILE (< 640px): barra inferior con hoja "Más". Oculta por CSS en pantallas mayores. -->
-        <app-bottom-nav id="mobile-nav" class="bottom-nav" />
+        <app-bottom-nav id="mobile-nav" class="wrapper__bottom-nav" />
 
         <!-- * VISTA DESKTOP / TABLET (≥ 640px): sidebar (colapsado a 80px por debajo de 1024px) + footer. Ocultos por CSS en mobile. -->
-        <nav id="desktop-nav" class="sidebar" aria-label="Principal">
+        <nav id="desktop-nav" class="wrapper__sidebar" aria-label="Principal">
             <app-sidebar [collapsed]="collapsed()" (collapsedChange)="onCollapsedChange($event)" />
-            <svg class="sidebar-edge" viewBox="0 0 40 100" preserveAspectRatio="none" aria-hidden="true">
-                <path [attr.d]="straightEdge" vector-effect="non-scaling-stroke">
+            <svg class="wrapper__sidebar-edge" viewBox="0 0 40 100" preserveAspectRatio="none" aria-hidden="true">
+                <path class="wrapper__sidebar-edge-path" [attr.d]="straightEdge" vector-effect="non-scaling-stroke">
                     <animate
                         #openWave
                         attributeName="d"
@@ -48,12 +50,12 @@ import { SidebarComponent } from './sidebar.component';
                 </path>
             </svg>
         </nav>
-        <footer id="desktop-footer" class="footer">
+        <footer id="desktop-footer" class="wrapper__footer">
             <app-footer />
         </footer>
 
         <!-- * Contenido: compartido por ambas vistas. -->
-        <main class="content">
+        <main class="wrapper__content">
             <router-outlet />
         </main>
     `,
@@ -63,6 +65,8 @@ export class WrapperComponent {
     // * Estados del componente.
     // null = automático: colapsado en tablet y abierto en desktop, resuelto por CSS sin esperar a JS.
     protected readonly collapsed = signal<boolean | null>(null);
+    // Solo true en el navegador tras hidratar: habilita la animación de entrada del sidebar (wrapper.css).
+    protected readonly ready = signal(false);
 
     // * Formas del borde animado.
     protected readonly straightEdge = verticalEdge(0);
@@ -72,6 +76,10 @@ export class WrapperComponent {
     // * Referencias a las animaciones SVG.
     private readonly openWave = viewChild.required<ElementRef<SVGAnimateElement>>('openWave');
     private readonly closeWave = viewChild.required<ElementRef<SVGAnimateElement>>('closeWave');
+
+    public constructor() {
+        afterNextRender(() => this.ready.set(true));
+    }
 
     // * Metodos del componente.
     protected onCollapsedChange(collapsed: boolean | null): void {

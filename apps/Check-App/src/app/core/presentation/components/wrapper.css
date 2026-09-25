@@ -1,3 +1,4 @@
+/* * Bloque: .wrapper (el propio :host). Modificadores: .wrapper--collapsed / .wrapper--expanded. */
 :host {
     width: 100%;
     height: 100dvh;
@@ -11,47 +12,146 @@
     grid-template-areas:
         "sidebar content"
         "sidebar footer";
-}
 
-:host.collapsed {
-    grid-template-columns: minmax(80px, 80px) 1fr;
-}
-
-/* * VISTA TABLET (640px–1023px): colapsado por defecto con CSS, así el HTML prerenderizado ya sale a 80px.
-   Solo se abre si el usuario lo pide (.expanded). */
-@media (max-width: 1023.98px) {
-    :host:not(.expanded) {
+    &.wrapper--collapsed {
         grid-template-columns: minmax(80px, 80px) 1fr;
+    }
+
+    /* * VISTA TABLET (640px–1023px): colapsado por defecto con CSS, así el HTML prerenderizado ya sale a 80px.
+       Solo se abre si el usuario lo pide (.wrapper--expanded). */
+    @media (max-width: 1024px) {
+        &:not(.wrapper--expanded) {
+            grid-template-columns: minmax(80px, 80px) 1fr;
+        }
+    }
+
+    /* * VISTA MOBILE (< 640px, el breakpoint `sm` de Tailwind): una sola columna, contenido arriba y barra inferior abajo.
+       Va al final del bloque para ganarle a .wrapper--collapsed. */
+    @media (max-width: 640px) {
+        &,
+        &.wrapper--collapsed,
+        &:not(.wrapper--expanded) {
+            grid-template-columns: 1fr;
+            grid-template-rows: minmax(0, 1fr) auto;
+            grid-template-areas:
+                "content"
+                "nav";
+        }
     }
 }
 
-.bottom-nav {
+.wrapper__bottom-nav {
+    /* * Misma animación que .wrapper__sidebar pero en el eje Y (sale hacia abajo) y en espejo: aquí el estado oculto es el
+       de fuera (≥ 640px) y el visible el de la media query mobile.
+       - Salida (a tablet/desktop): la rige la transición de aquí fuera, ease-in de 0.5s como slide-out-left.
+       - Entrada (a mobile): la rige la transición de la media query, ease-out de 0.3s; el punto de partida lo da
+         @starting-style (más abajo).
+       - Oculto va en position: fixed pegado abajo: mientras sale ya no existe el área "nav" en el grid y, si siguiera
+         en el flujo, crearía una fila implícita que empujaría al contenido. */
     grid-area: nav;
     display: none;
+    position: fixed;
+    inset-inline: 0;
+    inset-block-end: 0;
+    transform: translateY(1000px);
+    opacity: 0;
+    transition:
+        transform 0.5s cubic-bezier(0.550, 0.085, 0.680, 0.530),
+        opacity 0.5s cubic-bezier(0.550, 0.085, 0.680, 0.530),
+        display 0.5s allow-discrete;
+
+    /* transform: none (no translateY(0)) para no crear un containing block que atrape a la hoja "Más" (position: fixed). */
+    @media (max-width: 640px) {
+        display: block;
+        position: relative;
+        transform: none;
+        opacity: 1;
+        transition:
+            transform 0.3s cubic-bezier(0.250, 0.460, 0.450, 0.940),
+            opacity 0.3s cubic-bezier(0.250, 0.460, 0.450, 0.940),
+            display 0.3s allow-discrete;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        transition: none;
+    }
 }
 
-
-.sidebar {
+.wrapper__sidebar {
+    /* * Animación del sidebar al cruzar el breakpoint mobile: réplica de slide-out-left (animations.css) hecha con transition.
+    - Una transition no corre en el primer render (no hay estado "antes"), solo cuando un valor cambia. Por eso al recargar
+        en mobile el sidebar ya sale oculto, sin parpadeo, y solo se anima al redimensionar.
+    - La transición que se usa es la del estado AL QUE se llega: la de aquí fuera rige la entrada y la de la media query
+        mobile rige la salida. Así cada sentido tiene su propia duración y curva.
+    - Salida (a mobile): transform y opacity pasan a los valores del 100% de slide-out-left, con su misma duración y curva (ease-in).
+        allow-discrete retrasa el display: none hasta que termina la transición, si no desaparecería de golpe.
+    - Entrada (desde mobile): el mismo recorrido a la inversa, pero más corto y con curva ease-out (arranca rápido y frena
+        al llegar). Viene de display: none, así que el punto de partida lo da @starting-style (más abajo). */
     grid-area: sidebar;
     padding: 10px;
     position: relative;
     z-index: 1;
+    transition:
+        transform 0.3s cubic-bezier(0.250, 0.460, 0.450, 0.940),
+        opacity 0.3s cubic-bezier(0.250, 0.460, 0.450, 0.940),
+        display 0.3s allow-discrete;
+
+    /* Fuera del grid mientras sale, si no crearía una columna implícita y empujaría al contenido. Ancho del sidebar en tablet. */
+    @media (max-width: 640px) {
+        display: none;
+        position: fixed;
+        inset-block: 0;
+        inset-inline-start: 0;
+        width: 80px;
+        transform: translateX(-1000px);
+        opacity: 0;
+        transition:
+            transform 0.5s cubic-bezier(0.550, 0.085, 0.680, 0.530),
+            opacity 0.5s cubic-bezier(0.550, 0.085, 0.680, 0.530),
+            display 0.5s allow-discrete;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        transition: none;
+    }
 }
+
+/* * Punto de partida de la entrada (valores del 100% de slide-out-left). Solo tras hidratar (.wrapper--ready),
+   porque @starting-style también se aplica en el primer render y el sidebar entraría volando en cada carga de página. */
+:host(.wrapper--ready) .wrapper__sidebar {
+    @starting-style {
+        transform: translateX(-1000px);
+        opacity: 0;
+    }
+}
+
+/* * Lo mismo para la entrada del bottom-nav, desde abajo. */
+:host(.wrapper--ready) .wrapper__bottom-nav {
+    @starting-style {
+        transform: translateY(1000px);
+        opacity: 0;
+    }
+}
+
 /* El scroll vive solo aquí: la página no se desplaza, así sidebar y footer se quedan en pantalla. */
-.content {
+.wrapper__content {
     grid-area: content;
     padding: 10px;
     overflow: auto;
 }
 
-.footer {
+.wrapper__footer {
     border-top: 2px white solid;
     grid-area: footer;
     padding: 10px;
+
+    @media (max-width: 640px) {
+        display: none;
+    }
 }
 
 /* Línea del borde: centrada sobre el lado derecho del nav, ocupa toda su altura. */
-.sidebar-edge {
+.wrapper__sidebar-edge {
     position: absolute;
     top: 0;
     right: -20px;
@@ -61,33 +161,8 @@
     pointer-events: none;
 }
 
-.sidebar-edge path {
+.wrapper__sidebar-edge-path {
     fill: none;
     stroke: white;
     stroke-width: 2px;
 }
-
-/* * VISTA MOBILE (< 640px, el breakpoint `sm` de Tailwind): una sola columna, contenido arriba y barra inferior abajo.
-   Va al final del archivo para ganarle a :host.collapsed. */
-@media (max-width: 639.98px) {
-    :host,
-    :host.collapsed,
-    :host:not(.expanded) {
-        grid-template-columns: 1fr;
-        grid-template-rows: minmax(0, 1fr) auto;
-        grid-template-areas:
-            "content"
-            "nav";
-    }
-
-    .sidebar,
-    .footer {
-        display: none;
-    }
-
-    .bottom-nav {
-        display: block;
-    }
-}
-
-
