@@ -1,0 +1,246 @@
+/* * Movimiento de la UI hecho solo con CSS. Cada bloque es una utilidad que se activa con una clase; nada corre hasta usarla.
+   Todo se apaga con prefers-reduced-motion (última sección). */
+
+:root {
+  /* Curvas compartidas: `--ease-out` frena al llegar y `--ease-spring` rebasa un poco y vuelve, como un resorte. */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: linear(0, 0.35 8%, 0.95 20%, 1.12 30%, 1.05 42%, 0.98 55%, 1.01 70%, 1);
+}
+
+/* * Transición entre rutas (View Transitions, se activa con withViewTransitions en app.config).
+   Solo se anima el contenido (view-transition-name en wrapper.css): sidebar y footer se quedan quietos. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(content) {
+  animation: 160ms ease-in both fade-out-up;
+  mix-blend-mode: normal;
+}
+
+::view-transition-new(content) {
+  animation: 320ms var(--ease-out) 80ms both rise-in;
+  mix-blend-mode: normal;
+}
+
+/* * Entrada de elementos: sube unos píxeles mientras aparece. Para listas, `--i` (índice) escalona cada elemento. */
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-out-up {
+  to { opacity: 0; transform: translateY(-8px); }
+}
+
+.rise-in {
+  animation: rise-in 420ms var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * 50ms);
+}
+
+/* * Entrada lateral, para el sidebar. */
+@keyframes slide-in-left {
+  from { opacity: 0; transform: translateX(-16px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.slide-in-left {
+  animation: slide-in-left 420ms var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * 60ms + 150ms);
+}
+
+/* * Pastilla del item activo de un menú: sigue al icono activo con anchor positioning y se desliza con rebote cuando cambia.
+   Cada menú pone `anchor-name` en su icono activo y el mismo nombre en `position-anchor` de su .nav-pill.
+   El contenedor necesita `relative isolate` para que la pastilla quede detrás del texto. Sin JS: sale igual en el HTML prerenderizado. */
+.nav-pill {
+  position: absolute;
+  top: anchor(top);
+  left: anchor(left);
+  width: anchor-size(width);
+  height: anchor-size(height);
+  z-index: -1;
+  pointer-events: none;
+  background: var(--color-blue-600);
+  transition:
+    top 550ms var(--ease-spring),
+    left 550ms var(--ease-spring),
+    width 250ms var(--ease-out),
+    height 250ms var(--ease-out);
+}
+
+/* Navegadores sin anchor positioning: sin pastilla, el icono activo se pinta directo. */
+@supports not (anchor-name: --a) {
+  .nav-pill {
+    display: none;
+  }
+
+  .is-active [data-indicator-target] {
+    background-color: var(--color-blue-600);
+  }
+}
+
+/* * Rebote del icono al activarse: se aplasta y vuelve, una vez. */
+@keyframes pop {
+  0% { transform: scale(1); }
+  35% { transform: scale(0.82); }
+  70% { transform: scale(1.12); }
+  100% { transform: scale(1); }
+}
+
+.pop-on-active.is-active .pop-target {
+  animation: pop 450ms var(--ease-out);
+}
+
+/* * Respuesta al tocar: los botones se hunden un poco. Va en la capa `components` para que las utilidades de Tailwind
+   (transition-*, scale-*) sigan ganando; `.press` añade además la transición suave al soltar. */
+@layer components {
+  button:not(:disabled):active,
+  [role='button']:active,
+  .press:active {
+    scale: 0.96;
+  }
+}
+
+.press {
+  transition: scale 120ms var(--ease-out);
+}
+
+/* * Tarjetas y filas: se elevan al pasar el mouse o al enfocar con teclado. */
+.lift {
+  transition: translate 200ms var(--ease-out), box-shadow 200ms;
+}
+
+.lift:hover,
+.lift:focus-within {
+  translate: 0 -2px;
+  box-shadow: 0 8px 20px rgb(0 0 0 / 0.25);
+}
+
+/* * Esqueleto de carga: un brillo recorre el bloque mientras llegan los datos. */
+@keyframes shimmer {
+  to { background-position-x: -200%; }
+}
+
+.skeleton {
+  border-radius: 0.5rem;
+  background: linear-gradient(90deg, rgb(255 255 255 / 0.06) 25%, rgb(255 255 255 / 0.16) 50%, rgb(255 255 255 / 0.06) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+
+/* * Pulso de estado (en línea, sincronizando): un anillo que se expande y se desvanece. */
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, currentColor 55%, transparent); }
+  100% { box-shadow: 0 0 0 8px transparent; }
+}
+
+.pulse-dot {
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: currentColor;
+  animation: pulse-ring 1.8s ease-out infinite;
+}
+
+/* * Error de validación: tiembla una vez. Se dispara al crearse el elemento (por ejemplo dentro de un @if). */
+@keyframes shake {
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+  100% { transform: translateX(0); }
+}
+
+.shake {
+  animation: shake 400ms ease-in-out;
+}
+
+/* * Check que se dibuja: para un <path pathLength="1"> con trazo. `.check-draw` traza el círculo y `.check-draw--late` el check. */
+@keyframes draw {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
+
+.check-draw {
+  stroke-dasharray: 1;
+  animation: draw 500ms var(--ease-out) both;
+}
+
+.check-draw--late {
+  animation-delay: 350ms;
+  animation-duration: 350ms;
+}
+
+/* * Número que cuenta hasta su valor: `<span class="count-up" style="--n: 42"></span>`.
+   Un entero registrado con @property se puede animar, y counter() lo pinta como texto. */
+@property --count {
+  syntax: '<integer>';
+  initial-value: 0;
+  inherits: false;
+}
+
+@keyframes count-up {
+  from { --count: 0; }
+}
+
+.count-up {
+  --count: var(--n, 0);
+  animation: count-up 900ms var(--ease-out) both;
+  counter-reset: count var(--count);
+}
+
+.count-up::after {
+  content: counter(count);
+}
+
+/* * Aparece al entrar en pantalla mientras se hace scroll. Solo donde el navegador soporta animaciones ligadas al scroll. */
+@supports (animation-timeline: view()) {
+  .reveal {
+    animation: rise-in linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 60%;
+  }
+}
+
+/* * Fila que se acaba de agregar: un destello que se apaga. */
+@keyframes flash {
+  from { background-color: rgb(37 99 235 / 0.35); }
+}
+
+.flash {
+  animation: flash 1.2s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @layer components {
+    button:not(:disabled):active,
+    [role='button']:active,
+    .press:active {
+      scale: 1;
+    }
+  }
+
+  .nav-pill {
+    transition: none;
+  }
+
+  .rise-in, .slide-in-left, .skeleton, .pulse-dot, .shake, .flash,
+  .check-draw, .count-up, .reveal, .pop-on-active.is-active .pop-target {
+    animation: none;
+  }
+
+  .press {
+    transition: none;
+  }
+
+  .lift:hover,
+  .lift:focus-within {
+    translate: none;
+  }
+
+  ::view-transition-old(content),
+  ::view-transition-new(content) {
+    animation: none;
+  }
+}
