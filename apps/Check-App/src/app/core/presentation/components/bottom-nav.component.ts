@@ -1,13 +1,14 @@
 import { afterNextRender, Component, computed, ElementRef, inject, Injector, signal, viewChild } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { GSAPService } from '@pos-architecture/util-animations';
 import { filter, map } from 'rxjs';
-import { edgeWave, horizontalEdge } from './edge-wave';
 import { NavItem, PRIMARY_NAV, SECONDARY_NAV } from './nav-items';
 
 @Component({
 	selector: 'app-bottom-nav',
     imports: [RouterLink, RouterLinkActive],
+    providers: [GSAPService],
     host: { '(document:keydown.escape)': 'closeMore()' },
     styles: [`
         :host {
@@ -39,6 +40,11 @@ import { NavItem, PRIMARY_NAV, SECONDARY_NAV } from './nav-items';
             position: fixed;
             inset: 0;
             z-index: 40;
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            border: 0;
+            cursor: default;
             background: rgb(0 0 0 / 0.6);
         }
 
@@ -76,18 +82,7 @@ import { NavItem, PRIMARY_NAV, SECONDARY_NAV } from './nav-items';
 	template: `
         <nav aria-label="Principal">
             <svg class="edge" viewBox="0 0 100 20" preserveAspectRatio="none" aria-hidden="true">
-                <path [attr.d]="straightEdge" vector-effect="non-scaling-stroke">
-                    <animate
-                        #wave
-                        attributeName="d"
-                        begin="indefinite"
-                        dur="600ms"
-                        calcMode="spline"
-                        [attr.values]="tabEdge.values"
-                        [attr.keyTimes]="tabEdge.keyTimes"
-                        [attr.keySplines]="tabEdge.keySplines"
-                    />
-                </path>
+                <path #edge [attr.d]="straightEdge" vector-effect="non-scaling-stroke" />
             </svg>
 
             <ul class="grid grid-cols-5 px-1 pt-2 pb-1">
@@ -99,7 +94,7 @@ import { NavItem, PRIMARY_NAV, SECONDARY_NAV } from './nav-items';
                             routerLinkActive="is-active"
                             [routerLinkActiveOptions]="{ exact: true }"
                             ariaCurrentWhenActive="page"
-                            (click)="ripple()"
+                            (click)="ripple($index)"
                         >
                             <span class="h-7 w-11 flex items-center justify-center rounded-full text-xs font-semibold transition-colors duration-200 group-[.is-active]:bg-blue-600 group-[.is-active]:text-white" aria-hidden="true">
                                 {{ item.short }}
@@ -130,7 +125,7 @@ import { NavItem, PRIMARY_NAV, SECONDARY_NAV } from './nav-items';
 
         <!-- * Hoja "Más": destinos secundarios. -->
         @if (moreOpen()) {
-            <div class="backdrop" animate.enter="fade-in" animate.leave="fade-out" (click)="closeMore()"></div>
+            <button type="button" class="backdrop" tabindex="-1" aria-label="Cerrar" animate.enter="fade-in" animate.leave="fade-out" (click)="closeMore()"></button>
             <div
                 #sheet
                 id="mobile-nav-more"
@@ -174,6 +169,7 @@ export class BottomNavComponent {
     // * Inyeccion de dependencias.
     private readonly router = inject(Router);
     private readonly injector = inject(Injector);
+    private readonly animations = inject(GSAPService);
 
     // * Opciones de navegación.
     protected readonly primary = PRIMARY_NAV;
@@ -191,18 +187,25 @@ export class BottomNavComponent {
     // "Más" queda marcado cuando la ruta actual es uno de sus destinos.
     protected readonly secondaryActive = computed(() => this.secondary.some((item) => item.path === this.url()));
 
-    // * Formas del borde animado.
-    protected readonly straightEdge = horizontalEdge(0);
-    protected readonly tabEdge = edgeWave(horizontalEdge, [0, -7, 4.5, -2.5, 1, 0]);
-
     // * Referencias del template.
-    private readonly wave = viewChild.required<ElementRef<SVGAnimateElement>>('wave');
+    private readonly edge = viewChild.required<ElementRef<SVGPathElement>>('edge');
     private readonly moreButton = viewChild.required<ElementRef<HTMLButtonElement>>('moreButton');
     private readonly sheet = viewChild<ElementRef<HTMLElement>>('sheet');
 
+    // * Borde animado: se abomba hacia arriba sobre la pestaña tocada y vuelve a recto temblando como gelatina.
+    protected readonly straightEdge = this.edgePath(50, 10);
+
     // * Metodos del componente.
-    protected ripple(): void {
-        this.wave().nativeElement.beginElement();
+    // `tab` es la columna de la barra (la última es "Más").
+    protected ripple(tab: number): void {
+        if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        const edge = this.edge().nativeElement;
+        const x = ((tab + 0.5) / (this.primary.length + 1)) * 100;
+        // Parte del trazo actual, así un toque a mitad del temblor no salta.
+        this.animations.killTweensOf(edge);
+        this.animations.timeline()
+            .to(edge, { attr: { d: this.edgePath(x, 2) }, duration: 0.15, ease: 'power2.out' })
+            .to(edge, { attr: { d: this.straightEdge }, duration: 2, ease: 'elastic.out(1, 0.2)' });
     }
 
     protected openMore(): void {
@@ -224,6 +227,11 @@ export class BottomNavComponent {
         // Las opciones sin ruta no navegan: la hoja se queda abierta.
         if (!item.path) return;
         this.closeMore(false);
-        this.ripple();
+        this.ripple(this.primary.length);
+    }
+
+    // Borde en el viewBox 100x20 con la punta en (x, y); con y=10 queda recto. Siempre tiene los mismos números para que GSAP interpole `d`.
+    private edgePath(x: number, y: number): string {
+        return `M0 10 C${x / 2} 10 ${x / 2} ${y} ${x} ${y} C${(x + 100) / 2} ${y} ${(x + 100) / 2} 10 100 10`;
     }
 }

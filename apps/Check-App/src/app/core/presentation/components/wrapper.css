@@ -35,7 +35,8 @@
             grid-template-rows: minmax(0, 1fr) auto;
             grid-template-areas:
                 "content"
-                "nav";
+                "nav"
+                "footer";
         }
     }
 }
@@ -110,7 +111,6 @@
             opacity 0.5s cubic-bezier(0.550, 0.085, 0.680, 0.530),
             display 0.5s allow-discrete;
     }
-
     @media (prefers-reduced-motion: reduce) {
         transition: none;
     }

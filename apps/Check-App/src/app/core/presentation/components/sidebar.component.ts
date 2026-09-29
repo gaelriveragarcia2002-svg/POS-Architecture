@@ -3,7 +3,6 @@ import { Component, computed, effect, inject, model } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { RouterModule } from '@angular/router';
 import { map } from 'rxjs';
-import { TABLET_QUERY } from './breakpoints';
 import { PRIMARY_NAV, SECONDARY_NAV } from './nav-items';
 
 // * Lo visual del colapso (etiquetas ocultas, iconos centrados) depende del ancho real del sidebar
@@ -72,8 +71,8 @@ export class SidebarComponent {
     // * Estados del componente.
     // En mobile este componente no se renderiza, así que "small" aquí es el rango de tablet.
     protected readonly isSmallSize = toSignal(
-        this.bp.observe(TABLET_QUERY).pipe(map(r => r.matches)),
-        { initialValue: this.bp.isMatched(TABLET_QUERY) }
+        this.bp.observe('(max-width: 1024px)').pipe(map(r => r.matches)),
+        { initialValue: this.bp.isMatched('(max-width: 1024px)') }
     );
     // Estado real, resolviendo el automático con el breakpoint. Solo alimenta atributos (aria, title), no lo visual.
     protected readonly isCollapsed = computed(() => this.collapsed() ?? this.isSmallSize());

@@ -29,6 +29,9 @@
       ],
       "@pos-architecture/util-common": [
         "./libs/shared/util-common/src/index.ts"
+      ],
+      "@pos-architecture/util-animations": [
+        "./libs/shared/util-animations/src/index.ts"
       ]
     }
   },
