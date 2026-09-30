@@ -20,6 +20,14 @@ export const appRoutes: Route[] = [
                         (m) => m.HomePageComponent,
                     ),
             },
+            // Demo de ruta hija de items: compara la transición hijo/padre con la de rutas hermanas.
+            {
+                path: 'items/detalle',
+                loadComponent: () =>
+                    import('./features/items/presentation/item-detail.page.component').then(
+                        (m) => m.ItemDetailPageComponent,
+                    ),
+            },
             // Demo para probar ProductsFiltersService en vivo (union/prune + payloadFor).
             {
                 path: 'example-1',

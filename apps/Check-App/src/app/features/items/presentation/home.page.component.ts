@@ -1,8 +1,10 @@
 import { Component, afterNextRender, inject, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { AddItemUseCase, Item, ListItemsUseCase } from '@pos-architecture/items';
 
 @Component({
 	selector: 'app-home-page',
+	imports: [RouterLink],
 	template: `
         <div>
             <p>Estado: {{ $ready() ? 'listo ✅' : 'inicializando…' }}</p>
@@ -12,6 +14,7 @@ import { AddItemUseCase, Item, ListItemsUseCase } from '@pos-architecture/items'
             }
 
             <button (click)="addTestItem()">Agregar item de prueba</button>
+            <a routerLink="/items/detalle">Ver detalle →</a>
 
             <ul>
                 @for (item of $items(); track item.id) {

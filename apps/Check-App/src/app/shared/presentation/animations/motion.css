@@ -1,244 +1,120 @@
-/* * Movimiento de la UI hecho solo con CSS. Cada bloque es una utilidad que se activa con una clase; nada corre hasta usarla.
-   Todo se apaga con prefers-reduced-motion (última sección). */
+/* * Transición entre rutas (View Transitions).
+   Cómo funciona, paso a paso:
+   1. Al navegar, withViewTransitions (app.config) pide al navegador iniciar una transición.
+   2. El navegador toma una captura de la página tal como estaba (la "vieja").
+   3. Angular cambia la ruta: el DOM ya es el nuevo.
+   4. El navegador toma otra captura, esta vez viva, de la página nueva.
+   5. Arma un árbol de pseudo-elementos, uno por cada elemento con `view-transition-name`, y anima entre la vieja y la nueva:
+        ::view-transition
+         ├─ ::view-transition-group(root)      todo lo que NO tiene nombre: sidebar, footer, fondo
+         │   └─ ::view-transition-old(root)    captura vieja (imagen estática)
+         │   └─ ::view-transition-new(root)    captura nueva (viva)
+         └─ ::view-transition-group(content)   el elemento con `view-transition-name: content` (.wrapper__content en wrapper.css)
+             └─ ::view-transition-old(content)
+             └─ ::view-transition-new(content)
+   6. Al terminar las animaciones, los pseudo-elementos desaparecen y se ve la página real.
+
+   Por defecto el navegador hace un desvanecimiento cruzado de 250 ms de todas las capas. Aquí se reemplaza solo en `content`,
+   así sidebar y footer se quedan quietos y solo cambia lo que hay dentro del <main>.
+
+   Qué animación se usa depende del tipo de navegación. app.config la etiqueta (`transition.types`) y aquí se elige:
+     - sin etiqueta (rutas hermanas, A -> B): el contenido sube y se desvanece, y el nuevo entra subiendo.
+     - to-child (A -> A/12): entra desde la derecha, como avanzar un nivel.
+     - to-parent (A/12 -> A): entra desde la izquierda, como volver. */
 
 :root {
-  /* Curvas compartidas: `--ease-out` frena al llegar y `--ease-spring` rebasa un poco y vuelve, como un resorte. */
+  /* Curva de las entradas: arranca rápido y frena al llegar. */
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
-  --ease-spring: linear(0, 0.35 8%, 0.95 20%, 1.12 30%, 1.05 42%, 0.98 55%, 1.01 70%, 1);
 }
 
-/* * Transición entre rutas (View Transitions, se activa con withViewTransitions en app.config).
-   Solo se anima el contenido (view-transition-name en wrapper.css): sidebar y footer se quedan quietos. */
+/* * Capa `root` (todo lo que no es el contenido): sin animación, para que no se desvanezca al navegar.
+   `mix-blend-mode: normal` quita la mezcla aditiva (plus-lighter) que el navegador usa en el desvanecimiento cruzado por defecto,
+   que hace que los píxeles se vean más claros mientras las dos capturas se superponen. */
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation: none;
   mix-blend-mode: normal;
 }
 
+/* * Animación base, la de rutas hermanas. También es la que se ve en un navegador que no soporte los tipos de transición.
+   - old(content): la vista que se va. Sale rápido (160 ms) y con `ease-in` (arranca lento y acelera, como algo que se despide).
+   - new(content): la vista que llega. Entra más despacio (320 ms) y con un retraso de 80 ms, para que la vieja ya se haya ido
+     y no se superpongan dos textos a la vez.
+   `both` mantiene el primer fotograma durante el retraso (la nueva sigue invisible) y el último al terminar (sin parpadeo). */
 ::view-transition-old(content) {
-  animation: 160ms ease-in both fade-out-up;
+  animation: 160ms ease-in both route-out-up;
   mix-blend-mode: normal;
 }
 
 ::view-transition-new(content) {
-  animation: 320ms var(--ease-out) 80ms both rise-in;
+  animation: 320ms var(--ease-out) 80ms both route-in-up;
   mix-blend-mode: normal;
 }
 
-/* * Entrada de elementos: sube unos píxeles mientras aparece. Para listas, `--i` (índice) escalona cada elemento. */
-@keyframes rise-in {
+/* * A -> A/12 (bajar un nivel). `:active-view-transition-type(to-child)` solo coincide mientras corre una transición que
+   tenga esa etiqueta, que pone app.config. Al tener más especificidad que las reglas base, las reemplaza solo en ese caso.
+   La vista vieja se va hacia la izquierda y la nueva llega desde la derecha: parece avanzar hacia adentro. */
+:root:active-view-transition-type(to-child) {
+  &::view-transition-old(content) {
+    animation: 200ms ease-in both route-out-left;
+  }
+
+  &::view-transition-new(content) {
+    animation: 320ms var(--ease-out) 80ms both route-in-right;
+  }
+}
+
+/* * A/12 -> A (subir un nivel). Es el espejo de to-child: la vista vieja se va hacia la derecha y la nueva llega desde la
+   izquierda, como retroceder. */
+:root:active-view-transition-type(to-parent) {
+  &::view-transition-old(content) {
+    animation: 200ms ease-in both route-out-right;
+  }
+
+  &::view-transition-new(content) {
+    animation: 320ms var(--ease-out) 80ms both route-in-left;
+  }
+}
+
+/* * Fotogramas, con `from` y `to` explícitos. Estado natural del elemento: opacity 1 y sin desplazamiento.
+   `route-in-*` parten desde un estado desplazado y transparente hasta el normal;
+   `route-out-*` van del normal a uno desplazado y transparente. */
+
+/* Hermanas: la nueva sube 12 px desde abajo; la vieja sube 8 px mientras se desvanece. */
+@keyframes route-in-up {
   from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes fade-out-up {
+@keyframes route-out-up {
+  from { opacity: 1; transform: translateY(0); }
   to { opacity: 0; transform: translateY(-8px); }
 }
 
-.rise-in {
-  animation: rise-in 420ms var(--ease-out) both;
-  animation-delay: calc(var(--i, 0) * 50ms);
-}
-
-/* * Entrada lateral, para el sidebar. */
-@keyframes slide-in-left {
-  from { opacity: 0; transform: translateX(-16px); }
+/* Hijo (avanzar): la nueva llega desde la derecha; la vieja se va hacia la izquierda. */
+@keyframes route-in-right {
+  from { opacity: 0; transform: translateX(40px); }
   to { opacity: 1; transform: translateX(0); }
 }
 
-.slide-in-left {
-  animation: slide-in-left 420ms var(--ease-out) both;
-  animation-delay: calc(var(--i, 0) * 60ms + 150ms);
+@keyframes route-out-left {
+  from { opacity: 1; transform: translateX(0); }
+  to { opacity: 0; transform: translateX(-40px); }
 }
 
-/* * Pastilla del item activo de un menú: sigue al icono activo con anchor positioning y se desliza con rebote cuando cambia.
-   Cada menú pone `anchor-name` en su icono activo y el mismo nombre en `position-anchor` de su .nav-pill.
-   El contenedor necesita `relative isolate` para que la pastilla quede detrás del texto. Sin JS: sale igual en el HTML prerenderizado. */
-.nav-pill {
-  position: absolute;
-  top: anchor(top);
-  left: anchor(left);
-  width: anchor-size(width);
-  height: anchor-size(height);
-  z-index: -1;
-  pointer-events: none;
-  background: var(--color-blue-600);
-  transition:
-    top 550ms var(--ease-spring),
-    left 550ms var(--ease-spring),
-    width 250ms var(--ease-out),
-    height 250ms var(--ease-out);
+/* Padre (retroceder): la nueva llega desde la izquierda; la vieja se va hacia la derecha. */
+@keyframes route-in-left {
+  from { opacity: 0; transform: translateX(-40px); }
+  to { opacity: 1; transform: translateX(0); }
 }
 
-/* Navegadores sin anchor positioning: sin pastilla, el icono activo se pinta directo. */
-@supports not (anchor-name: --a) {
-  .nav-pill {
-    display: none;
-  }
-
-  .is-active [data-indicator-target] {
-    background-color: var(--color-blue-600);
-  }
+@keyframes route-out-right {
+  from { opacity: 1; transform: translateX(0); }
+  to { opacity: 0; transform: translateX(40px); }
 }
 
-/* * Rebote del icono al activarse: se aplasta y vuelve, una vez. */
-@keyframes pop {
-  0% { transform: scale(1); }
-  35% { transform: scale(0.82); }
-  70% { transform: scale(1.12); }
-  100% { transform: scale(1); }
-}
-
-.pop-on-active.is-active .pop-target {
-  animation: pop 450ms var(--ease-out);
-}
-
-/* * Respuesta al tocar: los botones se hunden un poco. Va en la capa `components` para que las utilidades de Tailwind
-   (transition-*, scale-*) sigan ganando; `.press` añade además la transición suave al soltar. */
-@layer components {
-  button:not(:disabled):active,
-  [role='button']:active,
-  .press:active {
-    scale: 0.96;
-  }
-}
-
-.press {
-  transition: scale 120ms var(--ease-out);
-}
-
-/* * Tarjetas y filas: se elevan al pasar el mouse o al enfocar con teclado. */
-.lift {
-  transition: translate 200ms var(--ease-out), box-shadow 200ms;
-}
-
-.lift:hover,
-.lift:focus-within {
-  translate: 0 -2px;
-  box-shadow: 0 8px 20px rgb(0 0 0 / 0.25);
-}
-
-/* * Esqueleto de carga: un brillo recorre el bloque mientras llegan los datos. */
-@keyframes shimmer {
-  to { background-position-x: -200%; }
-}
-
-.skeleton {
-  border-radius: 0.5rem;
-  background: linear-gradient(90deg, rgb(255 255 255 / 0.06) 25%, rgb(255 255 255 / 0.16) 50%, rgb(255 255 255 / 0.06) 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.4s linear infinite;
-}
-
-/* * Pulso de estado (en línea, sincronizando): un anillo que se expande y se desvanece. */
-@keyframes pulse-ring {
-  0% { box-shadow: 0 0 0 0 color-mix(in srgb, currentColor 55%, transparent); }
-  100% { box-shadow: 0 0 0 8px transparent; }
-}
-
-.pulse-dot {
-  display: inline-block;
-  width: 0.5rem;
-  height: 0.5rem;
-  border-radius: 50%;
-  background: currentColor;
-  animation: pulse-ring 1.8s ease-out infinite;
-}
-
-/* * Error de validación: tiembla una vez. Se dispara al crearse el elemento (por ejemplo dentro de un @if). */
-@keyframes shake {
-  20%, 60% { transform: translateX(-6px); }
-  40%, 80% { transform: translateX(6px); }
-  100% { transform: translateX(0); }
-}
-
-.shake {
-  animation: shake 400ms ease-in-out;
-}
-
-/* * Check que se dibuja: para un <path pathLength="1"> con trazo. `.check-draw` traza el círculo y `.check-draw--late` el check. */
-@keyframes draw {
-  from { stroke-dashoffset: 1; }
-  to { stroke-dashoffset: 0; }
-}
-
-.check-draw {
-  stroke-dasharray: 1;
-  animation: draw 500ms var(--ease-out) both;
-}
-
-.check-draw--late {
-  animation-delay: 350ms;
-  animation-duration: 350ms;
-}
-
-/* * Número que cuenta hasta su valor: `<span class="count-up" style="--n: 42"></span>`.
-   Un entero registrado con @property se puede animar, y counter() lo pinta como texto. */
-@property --count {
-  syntax: '<integer>';
-  initial-value: 0;
-  inherits: false;
-}
-
-@keyframes count-up {
-  from { --count: 0; }
-}
-
-.count-up {
-  --count: var(--n, 0);
-  animation: count-up 900ms var(--ease-out) both;
-  counter-reset: count var(--count);
-}
-
-.count-up::after {
-  content: counter(count);
-}
-
-/* * Aparece al entrar en pantalla mientras se hace scroll. Solo donde el navegador soporta animaciones ligadas al scroll. */
-@supports (animation-timeline: view()) {
-  .reveal {
-    animation: rise-in linear both;
-    animation-timeline: view();
-    animation-range: entry 0% entry 60%;
-  }
-}
-
-/* * Fila que se acaba de agregar: un destello que se apaga. */
-@keyframes flash {
-  from { background-color: rgb(37 99 235 / 0.35); }
-}
-
-.flash {
-  animation: flash 1.2s ease-out;
-}
-
+/* * Movimiento reducido: sin desplazamientos ni desvanecimientos. El cambio de ruta es instantáneo para quien lo pide. */
 @media (prefers-reduced-motion: reduce) {
-  @layer components {
-    button:not(:disabled):active,
-    [role='button']:active,
-    .press:active {
-      scale: 1;
-    }
-  }
-
-  .nav-pill {
-    transition: none;
-  }
-
-  .rise-in, .slide-in-left, .skeleton, .pulse-dot, .shake, .flash,
-  .check-draw, .count-up, .reveal, .pop-on-active.is-active .pop-target {
-    animation: none;
-  }
-
-  .press {
-    transition: none;
-  }
-
-  .lift:hover,
-  .lift:focus-within {
-    translate: none;
-  }
-
   ::view-transition-old(content),
   ::view-transition-new(content) {
     animation: none;

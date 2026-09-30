@@ -36,7 +36,8 @@ import { SidebarComponent } from './sidebar.component';
         </footer>
 
         <!-- * Contenido: compartido por ambas vistas. -->
-        <main class="wrapper__content">
+        <!-- Nombre de la transición entre rutas (motion.css): solo este contenido se anima al navegar, sidebar y footer no se mueven. -->
+        <main class="wrapper__content" style="view-transition-name: content">
             <router-outlet />
         </main>
     `,
