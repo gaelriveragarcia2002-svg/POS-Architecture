@@ -118,18 +118,48 @@
    - Una sola captura de toda la página: el <main> deja de tener su propia capa (`content`) para que no se deslice como en
      una navegación. El `!important` le gana al `view-transition-name` que tiene escrito en línea (wrapper.component).
    - La captura vieja se queda quieta debajo y la nueva aparece encima de 0 a 1 de opacidad. Como la vieja nunca se
-     vuelve transparente, no se ve el fondo a mitad de camino: los colores pasan de un tema al otro sin parpadeo. */
-:root:active-view-transition-type(theme) {
-  & .wrapper__content {
-    view-transition-name: none !important;
-  }
+     vuelve transparente, no se ve el fondo a mitad de camino: los colores pasan de un tema al otro sin parpadeo.
 
+   Paso a paso, al llamar a setTheme()/setMode():
+     1. ThemeService llama a startViewTransition({ types: ['theme'] }). Desde aquí el selector de abajo empieza a coincidir.
+     2. Regla 1: el <main> pierde su nombre, así toda la página queda en una sola capa (root).
+     3. El navegador captura la página con los colores viejos.
+     4. Se aplica el cambio (nuevas variables --p-* o la clase .app-dark) y el navegador crea los pseudo-elementos.
+     5. Reglas 2 y 3: la captura vieja se queda quieta y la página nueva aparece encima en 300 ms.
+     6. Termina la transición: el selector deja de coincidir, los pseudo-elementos desaparecen y el <main> recupera su nombre.
+
+   Cómo leer los selectores:
+     - `:root`                               → el elemento <html>.
+     - `:active-view-transition-type(theme)` → "mientras esté en curso una View Transition con el tipo `theme`".
+                                               Fuera de un cambio de tema (por ejemplo, al navegar) no coincide nunca.
+     - `&`                                   → se sustituye por el selector del bloque padre (`:root:active-view-transition-type(theme)`).
+     - `& .algo`  (CON espacio)              → un ELEMENTO real del DOM, descendiente de <html>, con la clase `algo`.
+     - `&::algo`  (SIN espacio)              → un PSEUDO-ELEMENTO del propio <html>. Los ::view-transition-* solo existen
+                                               durante la transición y cuelgan siempre de <html>, por eso van pegados a :root. */
+
+/* Se lee: "en <html>, mientras esté en curso una View Transition de tipo `theme`, aplica lo de dentro". */
+:root:active-view-transition-type(theme) {
+
+  /* 1. Elemento real. Selector completo: `:root:active-view-transition-type(theme) .wrapper__content`.
+     Se lee: "el <main> del wrapper (.wrapper__content), durante un cambio de tema".
+     Le quita el nombre `content` para que no tenga capa propia y no se deslice como en una navegación. El !important le
+     gana al `view-transition-name: content` que está escrito en línea en wrapper.component. */
+    & .wrapper__content {
+      view-transition-name: none !important;
+    }
+
+  /* 2. Pseudo-elemento. Selector completo: `:root:active-view-transition-type(theme)::view-transition-old(root)`.
+     Se lee: "la captura de la página ANTES del cambio (una imagen estática), durante un cambio de tema".
+     Sin animación: se queda quieta y opaca debajo, en lugar del desvanecimiento que el navegador hace por defecto. */
   &::view-transition-old(root) {
     animation: none;
   }
 
+  /* 3. Pseudo-elemento. Selector completo: `:root:active-view-transition-type(theme)::view-transition-new(root)`.
+     Se lee: "la página DESPUÉS del cambio (en vivo), durante un cambio de tema".
+     Aparece encima de la vieja, de opacidad 0 a 1 en 500 ms (keyframes theme-fade-in, justo debajo). */
   &::view-transition-new(root) {
-    animation: 500ms ease-in-out both theme-fade-in;
+    animation: 400ms ease-in-out both theme-fade-in;
   }
 }
 

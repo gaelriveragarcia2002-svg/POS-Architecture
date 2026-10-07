@@ -70,6 +70,9 @@ export class ThemeService {
         // theme()/mode() ya estén actualizadas en ella.
         this._appRef.tick();
       },
+      // Etiqueta esta transición con el tipo 'theme' (THEME_TRANSITION_TYPE). Mientras dura, en el CSS de la app coincide
+      // `:root:active-view-transition-type(theme)` (motion.css), que cambia la animación por el fundido de tema. Sin esta
+      // etiqueta se usaría la animación de las rutas y el <main> se deslizaría como en una navegación.
       types: [THEME_TRANSITION_TYPE],
     });
     // Si la transición se salta (dos cambios seguidos, una navegación al mismo tiempo) o se aborta, `ready` se rechaza,
