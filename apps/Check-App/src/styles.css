@@ -1,5 +1,8 @@
 /* You can add global styles to this file, and also import other style files */
 @import 'tailwindcss';
+/* Genera los estilos para el tema activo conectandolo con tailwindcss, lo que nos permite usar las clases de Tailwind de forma fluida.
+   Incluye el plugin de Optimus (bg-primary-50..950, surface-0..950, text-color...) y la variante dark:. */
+@import '../../../libs/shared/util-theme/src/styles/tailwind.css';
 @import './app/shared/presentation/animations/animations.css';
 @import './app/shared/presentation/animations/motion.css';
 
@@ -84,9 +87,17 @@
 
 /* Tamaños por defecto de las etiquetas. En la capa base para que las utilidades de Tailwind (text-sm, etc.) los sobrescriban. */
 @layer base {
+  /* Fondo y texto del tema activo (util-theme): el contenido va sobre surface-50/950 y los paneles del wrapper
+     (sidebar, footer, barra inferior) sobre --p-content-background, que Aura ya cambia entre claro y oscuro. */
   body {
     font-size: var(--step-0);
     line-height: 1.5;
+    background-color: var(--p-surface-50);
+    color: var(--p-text-color);
+
+    @variant dark {
+      background-color: var(--p-surface-950);
+    }
   }
 
   h1, h2, h3, h4, h5, h6 {

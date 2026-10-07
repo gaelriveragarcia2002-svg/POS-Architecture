@@ -15,7 +15,7 @@ import { NavItem, PRIMARY_NAV, SECONDARY_NAV } from './nav-items';
             display: block;
             position: relative;
             z-index: 1;
-            background-color: Canvas;
+            background-color: var(--p-content-background);
             padding-bottom: env(safe-area-inset-bottom, 0px);
         }
 
@@ -32,7 +32,7 @@ import { NavItem, PRIMARY_NAV, SECONDARY_NAV } from './nav-items';
 
         .edge path {
             fill: none;
-            stroke: white;
+            stroke: var(--p-content-border-color);
             stroke-width: 2px;
         }
 
@@ -45,7 +45,7 @@ import { NavItem, PRIMARY_NAV, SECONDARY_NAV } from './nav-items';
             padding: 0;
             border: 0;
             cursor: default;
-            background: rgb(0 0 0 / 0.6);
+            background: var(--p-mask-background);
         }
 
         .sheet {
@@ -54,8 +54,8 @@ import { NavItem, PRIMARY_NAV, SECONDARY_NAV } from './nav-items';
             right: 0;
             bottom: 0;
             z-index: 50;
-            background-color: Canvas;
-            border-top: 1px solid rgb(255 255 255 / 0.12);
+            background-color: var(--p-content-background);
+            border-top: 1px solid var(--p-content-border-color);
             border-radius: 20px 20px 0 0;
             padding-bottom: env(safe-area-inset-bottom, 0px);
         }
@@ -96,7 +96,7 @@ import { NavItem, PRIMARY_NAV, SECONDARY_NAV } from './nav-items';
                             ariaCurrentWhenActive="page"
                             (click)="ripple($index)"
                         >
-                            <span class="h-7 w-11 flex items-center justify-center rounded-full text-xs font-semibold transition-colors duration-200 group-[.is-active]:bg-blue-600 group-[.is-active]:text-white" aria-hidden="true">
+                            <span class="h-7 w-11 flex items-center justify-center rounded-full text-xs font-semibold transition-colors duration-200 group-[.is-active]:bg-primary group-[.is-active]:text-primary-contrast" aria-hidden="true">
                                 {{ item.short }}
                             </span>
                             <span class="max-w-full truncate">{{ item.label }}</span>
@@ -114,7 +114,7 @@ import { NavItem, PRIMARY_NAV, SECONDARY_NAV } from './nav-items';
                         [attr.aria-expanded]="moreOpen()"
                         (click)="openMore()"
                     >
-                        <span class="h-7 w-11 flex items-center justify-center rounded-full text-xs font-semibold transition-colors duration-200 group-[.is-active]:bg-blue-600 group-[.is-active]:text-white" aria-hidden="true">
+                        <span class="h-7 w-11 flex items-center justify-center rounded-full text-xs font-semibold transition-colors duration-200 group-[.is-active]:bg-primary group-[.is-active]:text-primary-contrast" aria-hidden="true">
                             •••
                         </span>
                         <span>Más</span>
@@ -136,7 +136,7 @@ import { NavItem, PRIMARY_NAV, SECONDARY_NAV } from './nav-items';
                 animate.enter="sheet-in"
                 animate.leave="sheet-out"
             >
-                <div class="mx-auto mt-2 mb-3 h-1 w-10 rounded-full bg-white/20" aria-hidden="true"></div>
+                <div class="mx-auto mt-2 mb-3 h-1 w-10 rounded-full bg-(--p-content-border-color)" aria-hidden="true"></div>
                 <h2 id="mobile-nav-more-title" class="px-4 pb-2 text-xs font-semibold uppercase tracking-wider opacity-60">
                     Más opciones
                 </h2>
@@ -144,7 +144,7 @@ import { NavItem, PRIMARY_NAV, SECONDARY_NAV } from './nav-items';
                     @for (item of secondary; track item.label) {
                         <li>
                             <a
-                                class="flex items-center gap-3 rounded-lg p-2 hover:bg-white/10 [&.is-active]:bg-white/10 aria-disabled:opacity-50"
+                                class="flex items-center gap-3 rounded-lg p-2 hover:bg-emphasis [&.is-active]:bg-emphasis aria-disabled:opacity-50"
                                 [routerLink]="item.path ?? null"
                                 routerLinkActive="is-active"
                                 [routerLinkActiveOptions]="{ exact: true }"
@@ -152,7 +152,7 @@ import { NavItem, PRIMARY_NAV, SECONDARY_NAV } from './nav-items';
                                 [attr.aria-disabled]="item.path ? null : true"
                                 (click)="onSecondaryClick(item)"
                             >
-                                <span class="size-9 flex-none flex items-center justify-center rounded-md bg-white/10 text-xs font-semibold" aria-hidden="true">
+                                <span class="size-9 flex-none flex items-center justify-center rounded-md bg-highlight text-xs font-semibold" aria-hidden="true">
                                     {{ item.short }}
                                 </span>
                                 <span>{{ item.label }}</span>

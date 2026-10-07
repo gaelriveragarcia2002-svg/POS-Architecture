@@ -113,6 +113,31 @@
   to { opacity: 0; transform: translateX(40px); }
 }
 
+/* * Cambio de tema o de modo claro/oscuro. ThemeService (util-theme) lo envuelve en una View Transition con el tipo `theme`,
+   así que reutiliza el mismo mecanismo que las rutas, pero con otra animación:
+   - Una sola captura de toda la página: el <main> deja de tener su propia capa (`content`) para que no se deslice como en
+     una navegación. El `!important` le gana al `view-transition-name` que tiene escrito en línea (wrapper.component).
+   - La captura vieja se queda quieta debajo y la nueva aparece encima de 0 a 1 de opacidad. Como la vieja nunca se
+     vuelve transparente, no se ve el fondo a mitad de camino: los colores pasan de un tema al otro sin parpadeo. */
+:root:active-view-transition-type(theme) {
+  & .wrapper__content {
+    view-transition-name: none !important;
+  }
+
+  &::view-transition-old(root) {
+    animation: none;
+  }
+
+  &::view-transition-new(root) {
+    animation: 500ms ease-in-out both theme-fade-in;
+  }
+}
+
+@keyframes theme-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 /* * Movimiento reducido: sin desplazamientos ni desvanecimientos. El cambio de ruta es instantáneo para quien lo pide. */
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-old(content),

@@ -43,6 +43,14 @@ export const appRoutes: Route[] = [
                         (m) => m.Example2PageComponent,
                     ),
             },
+            // Demo de temas: cambia entre los presets de util-theme y su modo claro/oscuro.
+            {
+                path: 'themes',
+                loadComponent: () =>
+                    import('./shared/presentation/theme-demo.page.component').then(
+                        (m) => m.ThemeDemoPageComponent,
+                    ),
+            },
             // Debug only — pesa lo que pesa AG Grid, por eso va lazy de verdad, en su
             // propio chunk, nunca dentro del bundle principal que descarga cualquier
             // usuario real. Ver el comentario en el componente antes de exponer esto

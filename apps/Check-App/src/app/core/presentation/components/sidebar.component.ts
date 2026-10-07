@@ -23,7 +23,7 @@ import { PRIMARY_NAV, SECONDARY_NAV } from './nav-items';
         <div class="w-full flex items-center flex-none justify-end @max-[8rem]:justify-center">
             <button
                 type="button"
-                class="bg-blue-600 min-w-10 min-h-10 rounded-lg p-2 hover:bg-blue-400 active:bg-blue-500 transition-all duration-200 hover:cursor-pointer"
+                class="bg-primary text-primary-contrast min-w-10 min-h-10 rounded-lg p-2 hover:bg-primary-emphasis active:bg-primary-emphasis-alt transition-all duration-200 hover:cursor-pointer"
                 aria-controls="desktop-nav"
                 [attr.aria-expanded]="!isCollapsed()"
                 (click)="toggle()"
@@ -37,7 +37,7 @@ import { PRIMARY_NAV, SECONDARY_NAV } from './nav-items';
                     @for (item of group; track item.label) {
                         <li>
                             <a
-                                class="group flex items-center gap-3 rounded-lg p-1 hover:bg-white/10 [&.is-active]:bg-white/10 aria-disabled:opacity-50 @max-[8rem]:justify-center"
+                                class="group flex items-center gap-3 rounded-lg p-1 hover:bg-emphasis [&.is-active]:bg-emphasis aria-disabled:opacity-50 @max-[8rem]:justify-center"
                                 [attr.title]="isCollapsed() ? item.label : null"
                                 [routerLink]="item.path ?? null"
                                 routerLinkActive="is-active"
@@ -45,7 +45,7 @@ import { PRIMARY_NAV, SECONDARY_NAV } from './nav-items';
                                 ariaCurrentWhenActive="page"
                                 [attr.aria-disabled]="item.path ? null : true"
                             >
-                                <span class="size-8 flex-none flex items-center justify-center rounded-md bg-white/10 text-xs font-semibold group-[.is-active]:bg-blue-600" aria-hidden="true">
+                                <span class="size-8 flex-none flex items-center justify-center rounded-md bg-highlight text-xs font-semibold group-[.is-active]:bg-primary group-[.is-active]:text-primary-contrast" aria-hidden="true">
                                     {{ item.short }}
                                 </span>
                                 <span class="min-w-0 truncate @max-[8rem]:sr-only">

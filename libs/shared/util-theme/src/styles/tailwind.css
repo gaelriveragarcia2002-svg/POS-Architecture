@@ -1,0 +1,7 @@
+/* * Puente entre util-theme y Tailwind v4. Cada app lo importa en su styles.css justo después de 'tailwindcss'. */
+
+/* Utilidades ligadas al tema activo de Optimus: bg-primary-50..950, surface-0..950, text-color, bg-highlight, etc. → var(--p-*). */
+@import '@openng/optimus-ui-tailwindcss';
+
+/* La variante dark: de Tailwind usa la misma clase que el darkModeSelector de Optimus (DARK_MODE_CLASS en themes.ts). */
+@custom-variant dark (&:where(.app-dark, .app-dark *));

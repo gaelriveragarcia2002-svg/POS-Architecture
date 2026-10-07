@@ -17,6 +17,7 @@ export const PRIMARY_NAV: NavItem[] = [
 // * Destinos secundarios: al fondo del sidebar, hoja "Más" en la barra inferior.
 export const SECONDARY_NAV: NavItem[] = [
     { label: 'Consola DB', short: 'DB', path: '/db' },
+    { label: 'Temas', short: 'TM', path: '/themes' },
     { label: 'Configuración', short: 'CF' },
     { label: 'Cerrar sesión', short: 'CS' },
 ];

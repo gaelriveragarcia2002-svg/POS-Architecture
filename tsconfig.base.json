@@ -32,6 +32,9 @@
       ],
       "@pos-architecture/util-animations": [
         "./libs/shared/util-animations/src/index.ts"
+      ],
+      "@pos-architecture/util-theme": [
+        "./libs/shared/util-theme/src/index.ts"
       ]
     }
   },
