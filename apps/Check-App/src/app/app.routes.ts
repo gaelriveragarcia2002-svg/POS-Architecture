@@ -12,6 +12,14 @@ export const appRoutes: Route[] = [
                         (m) => m.InspectionPageComponent,
                     ),
             },
+            // Productos + reporte de productos (@pos-architecture/reports).
+            {
+                path: 'products',
+                loadComponent: () =>
+                    import('./features/products/presentation/products.page.component').then(
+                        (m) => m.ProductsPageComponent,
+                    ),
+            },
             // Demo de items: queda parqueada pero accesible, no se borró.
             {
                 path: 'items',
@@ -62,6 +70,13 @@ export const appRoutes: Route[] = [
                         (m) => m.SqliteConsolePageComponent,
                     ),
             },
+            {
+                path: 'test',
+                loadComponent: () =>
+                    import('./shared/presentation/test-page.component').then(
+                        (m) => m.TestPageComponent,
+                    ),
+            }
         ],
     },
 ];

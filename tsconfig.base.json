@@ -24,6 +24,8 @@
       "@pos-architecture/auth": ["./libs/features/auth/src/index.ts"],
       "@pos-architecture/core": ["./libs/shared/core/src/index.ts"],
       "@pos-architecture/items": ["./libs/features/items/src/index.ts"],
+      "@pos-architecture/products": ["./libs/features/products/src/index.ts"],
+      "@pos-architecture/reports": ["./libs/platform/reports/src/index.ts"],
       "@pos-architecture/inspections": [
         "./libs/features/inspections/src/index.ts"
       ],

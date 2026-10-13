@@ -10,6 +10,7 @@ export interface NavItem {
 export const PRIMARY_NAV: NavItem[] = [
     { label: 'Inspecciones', short: 'IN', path: '/' },
     { label: 'Items', short: 'IT', path: '/items' },
+    { label: 'Productos', short: 'PR', path: '/products' },
     { label: 'Ejemplo 1', short: 'E1', path: '/example-1' },
     { label: 'Ejemplo 2', short: 'E2', path: '/example-2' },
 ];

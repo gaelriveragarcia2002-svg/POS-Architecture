@@ -33,6 +33,10 @@ export default [
               onlyDependOnLibsWithTags: ['scope:inspections', 'scope:shared'],
             },
             {
+              sourceTag: 'scope:reports',
+              onlyDependOnLibsWithTags: ['scope:reports', 'scope:shared'],
+            },
+            {
               sourceTag: 'scope:shared',
               onlyDependOnLibsWithTags: ['scope:shared'],
             },

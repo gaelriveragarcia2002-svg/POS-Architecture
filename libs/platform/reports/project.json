@@ -1,0 +1,12 @@
+{
+  "name": "reports",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/platform/reports/src",
+  "projectType": "library",
+  "tags": ["type:feature", "scope:reports"],
+  "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    }
+  }
+}
