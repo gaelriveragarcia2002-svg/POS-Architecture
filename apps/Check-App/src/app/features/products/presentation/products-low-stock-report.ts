@@ -1,8 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { NonNullableFormBuilder } from '@angular/forms';
-import { Observable, map } from 'rxjs';
 import { ListProductsUseCase } from '@pos-architecture/products';
 import { ReportFormDefinition } from '@pos-architecture/reports';
+import { Observable, map } from 'rxjs';
 import { buildLowStockCsv } from '../application/products-csv';
 
 interface LowStockForm {
@@ -44,4 +44,6 @@ export class ProductsLowStockReport implements ReportFormDefinition<LowStockForm
             .execute({ lowStockBelow: payload.threshold })
             .pipe(map((products) => new Blob([buildLowStockCsv(products, payload.threshold)], { type: 'text/csv;charset=utf-8' })));
     }
+
+
 }

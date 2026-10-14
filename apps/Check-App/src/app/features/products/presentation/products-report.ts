@@ -1,8 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { NonNullableFormBuilder } from '@angular/forms';
-import { Observable, map } from 'rxjs';
 import { ListProductsUseCase, ProductsFilter } from '@pos-architecture/products';
 import { ReportFormDefinition } from '@pos-architecture/reports';
+import { Observable, map } from 'rxjs';
 import { buildProductsCsv } from '../application/products-csv';
 
 const LOW_STOCK_THRESHOLD = 5;

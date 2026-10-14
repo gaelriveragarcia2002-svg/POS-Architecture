@@ -7,9 +7,12 @@
 // domain
 export * from './lib/domain/reports-definition';
 export * from './lib/domain/reports-gateway';
+export * from './lib/domain/report-job';
+export * from './lib/domain/report-job-gateway';
 
 // application
 export * from './lib/application/reports.service';
+export * from './lib/application/report-jobs.store';
 
 // infrastructure (el shell de la app necesita registrar esto)
 export * from './lib/infrastructure/provide-report';
@@ -18,4 +21,5 @@ export * from './lib/infrastructure/reports-endpoint.token';
 // presentation
 export * from './lib/presentation/report-form-definition';
 export * from './lib/presentation/report-runner.component';
+export * from './lib/presentation/report-jobs-panel.component';
 export * from './lib/presentation/shared-fields';

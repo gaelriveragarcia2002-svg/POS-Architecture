@@ -1,6 +1,7 @@
 import { Component, computed, inject, input, signal } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { ReportService } from '../application/reports.service';
+import { downloadBlob } from './download-blob';
 import { ReportFormDefinition } from './report-form-definition';
 
 /**
@@ -22,7 +23,7 @@ import { ReportFormDefinition } from './report-form-definition';
         Reporte:
         <select (change)="selectedId.set($any($event.target).value)">
           @for (r of reports(); track r.id) {
-            <option [value]="r.id" [selected]="r.id === active().id">{{ r.label }}</option>
+            <option [value]="r.id" [selected]="r.id === activeReport().id">{{ r.label }}</option>
           }
         </select>
       </label>
@@ -63,23 +64,23 @@ export class ReportRunnerComponent {
 
     // * Estado del componente.
     protected selectedId = signal<string | null>(null);
-    protected active = computed(() => this.reports().find((r) => r.id === this.selectedId()) ?? this.reports()[0]);
-    protected form = computed(() => this.active().buildForm(this.fb));
+    protected activeReport = computed(() => this.reports().find((r) => r.id === this.selectedId()) ?? this.reports()[0]);
+    protected form = computed(() => this.activeReport().buildForm(this.fb));
     protected fieldNames = computed(() => Object.keys(this.form().controls));
     protected loading = signal(false);
     protected error = signal('');
 
     // * Metodos del componente.
     protected isBoolean(name: string): boolean {
-        return typeof this.form().get(name)?.value === 'boolean';
+      return typeof this.form().get(name)?.value === 'boolean';
     }
 
     protected isDate(name: string): boolean {
-        return name === 'from' || name === 'to';
+      return name === 'from' || name === 'to';
     }
 
     protected generate() {
-        const report = this.active();
+        const report = this.activeReport();
         const value = this.form().getRawValue();
 
         this.loading.set(true);
@@ -87,7 +88,7 @@ export class ReportRunnerComponent {
 
         this.service.run(report, value).subscribe({
             next: (blob) => {
-                this.download(blob, `${report.id}.${report.extension ?? value['format'] ?? 'bin'}`);
+                downloadBlob(blob, `${report.id}.${report.extension ?? value['format'] ?? 'bin'}`);
                 this.loading.set(false);
             },
             error: () => {
@@ -97,12 +98,4 @@ export class ReportRunnerComponent {
         });
     }
 
-    private download(blob: Blob, filename: string) {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        a.click();
-        URL.revokeObjectURL(url);
-    }
 }

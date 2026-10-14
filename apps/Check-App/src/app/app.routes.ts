@@ -1,4 +1,5 @@
 import { Route } from '@angular/router';
+import { provideReporting } from '@pos-architecture/reports';
 
 export const appRoutes: Route[] = [
     {
@@ -15,10 +16,13 @@ export const appRoutes: Route[] = [
             // Productos + reporte de productos (@pos-architecture/reports).
             {
                 path: 'products',
-                loadComponent: () =>
-                    import('./features/products/presentation/products.page.component').then(
-                        (m) => m.ProductsPageComponent,
-                    ),
+                providers: [
+                    provideReporting({defaultEndpoint: '/api/reports/products'}),
+                ],
+                loadComponent: () => import('./features/products/presentation/products.page.component')
+                .then(
+                    (m) => m.ProductsPageComponent,
+                ),
             },
             // Demo de items: queda parqueada pero accesible, no se borró.
             {
