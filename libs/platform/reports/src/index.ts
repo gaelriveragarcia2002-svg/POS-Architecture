@@ -9,6 +9,8 @@ export * from './lib/domain/reports-definition';
 export * from './lib/domain/reports-gateway';
 export * from './lib/domain/report-job';
 export * from './lib/domain/report-job-gateway';
+export * from './lib/domain/report-job-storage';
+export * from './lib/domain/report-job-tracker';
 
 // application
 export * from './lib/application/reports.service';

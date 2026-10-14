@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { ReportJobsPanelComponent, ReportJobsStore, ReportService } from '@pos-architecture/reports';
+import { ReportJobsPanelComponent, ReportJobsStore } from '@pos-architecture/reports';
 import { ProductsSalesReport } from './products-sales-report';
 
 @Component({
@@ -7,14 +7,13 @@ import { ProductsSalesReport } from './products-sales-report';
 	standalone: true,
 	imports: [ReportJobsPanelComponent],
 	template: `
-    <button type="button" (click)="enqueueSales()">Generar ventas en segundo plano</button>
+    <button type="button" (click)="enqueueSales()">Generar ventas en segundo plano (sobrevive a la recarga)</button>
     <app-report-jobs-panel />
     `,
 })
 export class ProductsTestComponent {
 
     // * Inyeccion de depenendencias.
-    private service = inject(ReportService);
     private jobs = inject(ReportJobsStore);
     private salesReport = inject(ProductsSalesReport);
 

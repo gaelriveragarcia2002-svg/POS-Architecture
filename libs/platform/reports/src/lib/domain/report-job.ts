@@ -16,6 +16,8 @@ export interface ReportJob extends ReportJobStatus {
   readonly label: string;
   /** Extension del archivo al descargar. */
   readonly extension: string;
+  /** Epoch ms de cuando se encolo; permite descartar trabajos viejos al restaurar. */
+  readonly createdAt: number;
 }
 
 export const isFinalJobState = (state: ReportJobState): boolean =>
