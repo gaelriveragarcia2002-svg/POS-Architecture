@@ -63,6 +63,10 @@ export const appRoutes: Route[] = [
                         (m) => m.ThemeDemoPageComponent,
                     ),
             },
+            {
+                path: 'gallery',
+                loadComponent: () => import('./features/tests/presentation/gallery-demo.page.component').then(m => m.GalleryDemoPageComponent)
+            },
             // Debug only — pesa lo que pesa AG Grid, por eso va lazy de verdad, en su
             // propio chunk, nunca dentro del bundle principal que descarga cualquier
             // usuario real. Ver el comentario en el componente antes de exponer esto

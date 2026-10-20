@@ -16,7 +16,12 @@ import { ProductsTestComponent } from './products-test.component';
             <h2>Productos</h2>
             <table>
                 <thead>
-                    <tr><th>Nombre</th><th>Categoria</th><th>Precio</th><th>Stock</th></tr>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Categoria</th>
+                        <th>Precio</th>
+                        <th>Stock</th>
+                    </tr>
                 </thead>
                 <tbody>
                     @for (product of $products(); track product.id) {

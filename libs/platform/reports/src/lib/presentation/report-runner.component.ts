@@ -28,7 +28,6 @@ import { ReportFormDefinition } from './report-form-definition';
         </select>
       </label>
     }
-
     <form [formGroup]="form()" (ngSubmit)="generate()">
       @for (name of fieldNames(); track name) {
         <div>
