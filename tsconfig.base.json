@@ -37,6 +37,9 @@
       ],
       "@pos-architecture/util-theme": [
         "./libs/shared/util-theme/src/index.ts"
+      ],
+      "@pos-architecture/util-forms": [
+        "./libs/shared/util-forms/src/index.ts"
       ]
     }
   },

@@ -2,7 +2,7 @@ import { afterNextRender, Component, DestroyRef, effect, inject, input } from '@
 import { FormField } from '@angular/forms/signals';
 import { InputNumber } from '@openng/optimus-ui/inputnumber';
 import { InputText } from '@openng/optimus-ui/inputtext';
-import { InputWrapperComponent } from '@pos-architecture/core';
+import { InputWrapperComponent } from '@pos-architecture/util-forms';
 import { FilterRegistrationId, FILTRABLE_CATALOG_OPTIONS, ProductsFiltersService } from '../application/store/products-filters.service';
 
 @Component({

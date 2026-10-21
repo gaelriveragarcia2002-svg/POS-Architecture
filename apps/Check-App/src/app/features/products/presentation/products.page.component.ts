@@ -2,7 +2,7 @@ import { CurrencyPipe } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ListProductsUseCase } from '@pos-architecture/products';
-import { ReportFormDefinition, ReportRunnerComponent } from '@pos-architecture/reports';
+import { ReportFormDefinition } from '@pos-architecture/reports';
 import { ProductsLowStockReport } from './products-low-stock-report';
 import { ProductsReport } from './products-report';
 import { ProductsSalesReport } from './products-sales-report';
@@ -10,7 +10,7 @@ import { ProductsTestComponent } from './products-test.component';
 
 @Component({
 	selector: 'app-products-page',
-	imports: [CurrencyPipe, ReportRunnerComponent, ProductsTestComponent],
+	imports: [CurrencyPipe, ProductsTestComponent],
 	template: `
         <section>
             <h2>Productos</h2>
